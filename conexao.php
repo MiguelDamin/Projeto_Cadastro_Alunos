@@ -1,8 +1,9 @@
 <?php
-$host = "127.0.0.1";
-$user = "root";      // seu usuário do MySQL
-$pass = "Miguel11!";          // sua senha do MySQL
-$db   = "cadastro_alunos";
+$host = "ballast.proxy.rlwy.net";
+$port = "15574";
+$username = "root";
+$password = "gakUZoQlkPfWBiXEmEtGbvhLHCdvKuxH";
+$database = "railway";
 
 // cria a conexão
 $conn = new mysqli($host, $user, $pass, $db);
