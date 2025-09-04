@@ -1,13 +1,13 @@
 <?php
-// Conectar no banco PRIMEIRO
-$pdo = new PDO("mysql:host=127.0.0.1;dbname=cadastro_alunos", "root", "Miguel11!");
+// Inclui o arquivo de conexão que agora usa as variáveis do Railway
+include 'conexao.php'; // A variável $pdo virá daqui
 
 // Verificar se o formulário foi enviado
 $mensagem = "";
 if ($_POST && isset($_POST['user_editado'])) {
     $nome_digitado = $_POST["user_editado"];
     
-    // Buscar o aluno pelo nome
+    // Buscar o aluno pelo nome usando a conexão PDO
     $sql = "SELECT * FROM alunos WHERE nome = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$nome_digitado]);
