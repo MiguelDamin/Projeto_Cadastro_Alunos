@@ -61,3 +61,64 @@ button:hover {
   white-space: pre-line; /* mantém quebras de linha do texto */
   font-size: 14px;
 }
+
+
+/* Estilo do cabecalho para centralizar*/
+
+header {
+    background-color: blue;
+    color: white;
+    padding: 15px 20px; /* Padding equilibrado */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box; /* Importante para o width funcionar */
+    display: flex; /* Usa flexbox */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza os links */
+}
+
+/* Remove o h1 se não estiver usando, ou ajuste: */
+header h1 {
+    display: none; /* Se não quiser mostrar o título */
+}
+/* OU se quiser manter o título: */
+header h1 {
+    margin: 0;
+    margin-right: auto; /* Empurra o menu para a direita */
+    font-size: 1.5rem;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Links em linha */
+    gap: 0; /* Remove gap para links grudados */
+}
+
+header nav li {
+    /* Não precisa de estilos especiais */
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 20px; /* Padding generoso para área clicável */
+    display: block;
+    text-align: center;
+}
+
+header nav a:hover {
+    background-color: rgba(0, 0, 0, 0.2); /* Escurece no hover */
+}
+
+/* Ajusta o body */
+body {
+    margin: 0;
+    padding: 0;
+    margin-top: 60px; /* Espaço para o header fixo */
+}
