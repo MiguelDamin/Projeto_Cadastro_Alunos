@@ -13,7 +13,7 @@ if ($_POST && isset($_POST['user_editado'])) {
     $stmt->execute([$nome_digitado]);
     $aluno = $stmt->fetch();
     
-    if ($aluno) {
+    if ($aluno) {   
         // ENCONTROU! Redireciona para página de edição
         header("Location: editar_formulario.php?id=" . $aluno['id']);
         exit;
