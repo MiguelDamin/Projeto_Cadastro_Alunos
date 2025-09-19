@@ -66,7 +66,7 @@ button:hover {
 /* Estilo do cabecalho para centralizar*/
 
 header {
-    background-color: blue;
+    background-color: rgb(27, 74, 162);
     color: white;
     padding: 15px 20px; /* Padding equilibrado */
     position: fixed;
