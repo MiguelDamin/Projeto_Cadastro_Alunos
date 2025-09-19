@@ -3,11 +3,11 @@
 $host = "ballast.proxy.rlwy.net";      // Cole o valor de MYSQLHOST aqui
 $user = "root";      // Cole o valor de MYSQLUSER aqui
 $pass = "gakUZoQlkPfWBiXEmEtGbvhLHCdvKuxH";  // Cole o valor de MYSQLPASSWORD aqui
-$db   = "railway";  // Cole o valor de MYSQLDATABASE aqui
+$db   = "sistema_escolar";  // Cole o valor de MYSQLDATABASE aqui
 $port = 15574;        // Cole o valor de MYSQLPORT aqui (sem aspas)
 
 // Cria a conexão
-$conn = new mysqli($host, $user, $pass, $db, $port);
+$conexao = new mysqli($host, $user, $pass, $db, $port);
 
 // Testa a conexão
 if ($conn->connect_error) {

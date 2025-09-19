@@ -1,64 +1,73 @@
 <?php
-// Adicione estas duas linhas para depuração
+// Habilita a exibição de erros para facilitar a depuração
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// 1. Inicia a sessão.
+// 1. Inicia a sessão (essencial para o login)
 session_start();
 
 // 2. Inclui o arquivo de conexão
+// Garanta que este arquivo define a variável $conexao
 require_once 'conexao.php';
 
-// 3. Verifica se a requisição é do tipo POST
+// 3. Verifica se o formulário foi enviado via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $usuario = $_POST['usuario'];
+    // 4. Pega o email e a senha do formulário
+    // Corrigido: O login agora é feito com 'email', não 'usuario'
+    $email = $_POST['email']; 
     $senha = $_POST['senha'];
 
-    // 5. PREPARA A QUERY CORRIGIDA
-    //    Removemos 'primeiro_acesso' e colocamos 'ativo', que existe na sua tabela.
-    $sql = "SELECT id, nome_usuario, senha_hash, ativo FROM usuarios WHERE nome_usuario = ?";
+    // 5. Prepara a consulta SQL com as colunas corretas da sua tabela
+    // Corrigido: Buscamos por 'email' e selecionamos 'senha', 'nome_completo' e 'perfil'
+    $sql = "SELECT id, nome_completo, senha, perfil, ativo FROM usuarios WHERE email = ?";
     
     $stmt = $conexao->prepare($sql);
 
     if ($stmt) {
-        $stmt->bind_param("s", $usuario);
+        // 6. Associa o email do formulário ao '?' da consulta
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $resultado = $stmt->get_result();
 
+        // 7. Se encontrou exatamente um usuário com aquele email...
         if ($resultado->num_rows === 1) {
-            $user = $resultado->fetch_assoc();
+            $usuario = $resultado->fetch_assoc();
 
-            // 7. Verifica se a senha está correta E se o usuário está ativo
-            if (password_verify($senha, $user['senha_hash'])) {
+            // 8. Verifica se a senha digitada corresponde à senha hash no banco
+            // Corrigido: Usamos a coluna 'senha'
+            if (password_verify($senha, $usuario['senha'])) {
 
-                // VERIFICA SE O USUÁRIO ESTÁ ATIVO (ativo = 1)
-                if ($user['ativo'] == 1) {
-                    // 8. Login bem-sucedido! Guarda os dados na sessão.
-                    $_SESSION['usuario_id'] = $user['id'];
-                    $_SESSION['usuario_nome'] = $user['nome_usuario'];
+                // 9. Verifica se o usuário está ativo (ativo = 1 ou TRUE)
+                if ($usuario['ativo']) {
+                    // 10. SUCESSO! Guarda os dados importantes na sessão
+                    $_SESSION['usuario_id'] = $usuario['id'];
+                    $_SESSION['usuario_nome'] = $usuario['nome_completo']; // Corrigido
+                    $_SESSION['usuario_perfil'] = $usuario['perfil'];     // Melhoria: guarda o perfil
 
-                    // 9. Redireciona para a página principal
-                    header("Location: cadastro_cliente.php");
+                    // 11. Redireciona para a página principal do sistema
+                    header("Location: painel.php"); // Sugestão: usar um nome como 'painel.php'
                     exit();
                 } else {
-                    // Se o usuário não está ativo, redireciona com um erro específico
+                    // Erro: Usuário existe, mas está inativo
                     header("Location: login.php?erro=inativo");
                     exit();
                 }
             }
         }
         
-        // Se o usuário não foi encontrado ou a senha está errada
-        header("Location: login.php?erro=1");
+        // Se o email não foi encontrado ou a senha está errada, o erro é o mesmo
+        header("Location: login.php?erro=invalido");
         exit();
 
     } else {
-        echo "<h1>Erro na preparação da query: " . $conexao->error . "</h1>";
+        // Erro fatal na preparação da consulta
+        die("Erro na preparação da query: " . $conexao->error);
     }
 
     $stmt->close();
 } else {
+    // Se alguém tentar acessar o arquivo diretamente, redireciona para o login
     header("Location: login.php");
     exit();
 }
