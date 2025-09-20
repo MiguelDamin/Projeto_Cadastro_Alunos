@@ -15,7 +15,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão Escolar</title>
-    <link rel="stylesheet" href="/MeusProjetos/Projeto_Cadastro_Alunos/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <header>
     <h1>Sistema Escolar</h1>
