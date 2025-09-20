@@ -1,0 +1,130 @@
+/* Estilo geral */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding-top: 80px; /* Espaço para o header fixo */
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2, h3 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    margin: 20px 0;
+}
+
+/* --- A MÁGICA DO FLEXBOX PARA O FORMULÁRIO --- */
+
+/* A linha que contém os grupos de campos */
+.form-row {
+    display: flex; /* ATIVA O FLEXBOX! */
+    gap: 20px; /* Cria um espaço de 20px entre os grupos */
+    margin-bottom: 15px; /* Espaço abaixo da linha */
+}
+
+/* O grupo de cada campo (label + input) */
+.form-group {
+    flex: 1; /* Faz cada grupo ocupar um espaço igual na linha */
+    display: flex;
+    flex-direction: column; /* Coloca o label em cima do input */
+}
+
+/* --- ESTILOS PARA OS ELEMENTOS DO FORMULÁRIO --- */
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Essencial para o padding não estourar o layout */
+    font-size: 1rem;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+}
+
+/* Estilo do Header que você já tinha */
+header {
+    background-color: #003366; /* Um azul mais escuro */
+    color: white;
+    padding: 15px 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alinha o h1 à esquerda e o nav à direita */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px; /* Espaço entre os links */
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+header nav a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}

@@ -1,25 +1,27 @@
 <?php
-// Preencha com os dados do seu banco de dados do Railway
-$host = "ballast.proxy.rlwy.net";      // Cole o valor de MYSQLHOST aqui
-$user = "root";      // Cole o valor de MYSQLUSER aqui
-$pass = "gakUZoQlkPfWBiXEmEtGbvhLHCdvKuxH";  // Cole o valor de MYSQLPASSWORD aqui
-$db   = "sistema_escolar";  // Cole o valor de MYSQLDATABASE aqui
-$port = 15574;        // Cole o valor de MYSQLPORT aqui (sem aspas)
+// Preencha com os dados do seu banco de dados
+$host = "ballast.proxy.rlwy.net";      
+$user = "root";      
+$pass = "gakUZoQlkPfWBiXEmEtGbvhLHCdvKuxH";  
+$db   = "sistema_escolar";  
+$port = 15574;        
+$charset = 'utf8mb4'; // Essencial para suportar todos os caracteres
 
-// Cria a conexão
-$conexao = new mysqli($host, $user, $pass, $db, $port);
+// DSN (Data Source Name) para a conexão PDO
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 
-// Testa a conexão
-if ($conn->connect_error) {
-  die("Erro de conexão: " . $conn->connect_error);
-}
+// Opções do PDO para um comportamento mais seguro e útil
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Lança exceções em caso de erro
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Retorna os dados como array associativo
+    PDO::ATTR_EMULATE_PREPARES   => false,                  // Usa prepared statements nativos do DB
+];
 
-// Cria uma conexão PDO para usar nos outros arquivos
+// Tenta estabelecer a conexão
 try {
-    $dsn = "mysql:host={$host};port={$port};dbname={$db}";
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Erro na conexão PDO: " . $e->getMessage());
+     $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+     // Em caso de erro, exibe uma mensagem e encerra o script
+     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 ?>
