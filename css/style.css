@@ -128,3 +128,17 @@ header nav a {
 header nav a:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
+.password-container {
+    position: relative; /* Essencial para posicionar o ícone dentro dele */
+    width: 100%;
+}
+
+/* Posicionamento do ícone do olho */
+.password-container i {
+    position: absolute; /* Posição absoluta em relação ao container */
+    right: 15px; /* Distância da borda direita */
+    top: 50%; /* Alinha o topo do ícone ao meio do campo */
+    transform: translateY(-50%); /* Centraliza verticalmente o ícone */
+    cursor: pointer; /* Muda o cursor para uma "mãozinha" */
+    color: #888; /* Cor cinza para o ícone */
+}
