@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
         // Se não encontrar o aluno, redireciona para a busca
         header("Location: edit.php");
         exit;
-    }
+    }   
 } else {
     // Se não houver ID na URL, redireciona para a busca
     header("Location: edit.php");

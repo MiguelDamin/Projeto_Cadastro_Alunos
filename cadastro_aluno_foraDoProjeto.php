@@ -1,3 +1,4 @@
+<!-- Usando o cadastro geral, esse foi substituido!!!! -->
 <?php 
 require 'templates/header.php'; 
 require 'conexao.php';

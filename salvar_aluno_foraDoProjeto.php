@@ -1,3 +1,4 @@
+<!-- Substituido pedo cadastro geral -->
 <?php
 session_start();
 // Se não estiver logado, não pode salvar!

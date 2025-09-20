@@ -22,8 +22,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <nav>
         <ul>
             <li><a href="painel.php">Painel</a></li>
-            <li><a href="cadastro_aluno.php">Cadastrar Aluno</a></li>
-            <li><a href="cadastro_responsavel.php">Cadastrar Responsável</a></li>
+            <li><a href="cadastro_geral.php?reset=1">Novo Cadastro (Responsável + Aluno)</a></li>
             <li><a href="cadastro_turma.php">Cadastrar Turma</a></li>
             <li><a href="logout.php" style="color: #ffc107;">Sair (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</a></li>
         </ul>
