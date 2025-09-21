@@ -2,6 +2,9 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+// Define o tempo de vida do cookie da sessão para 2 horas
+$tempo_limite_sessao = 7200;
+session_set_cookie_params($tempo_limite_sessao);
 
 session_start();
 require_once 'conexao.php';

@@ -1,9 +1,14 @@
 <?php
+
 // Inclui o arquivo de conexão com o banco de dados
 require_once 'conexao.php'; // Certifique-se de que o caminho para conexao.php está correto
 
 // Inicia a sessão (necessário se você usar sessão para id do usuário, etc.)
 if (session_status() === PHP_SESSION_NONE) {
+    // Define o tempo de vida do cookie da sessão para 2 horas
+    $tempo_limite_sessao = 7200;
+    session_set_cookie_params($tempo_limite_sessao);
+
     session_start();
 }
 
