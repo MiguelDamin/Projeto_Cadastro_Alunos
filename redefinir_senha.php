@@ -25,8 +25,8 @@ if ($user === false) {
     <title>Redefinir Senha</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <div class="container" style="max-width: 400px;">
+<body class="auth-page">
+    <div class="container">
         <h2>Redefinir Nova Senha</h2>
         <form action="processa_redefinir_senha.php" method="POST">
             <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">

@@ -3,16 +3,26 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f7f6;
     margin: 0;
-    padding-top: 80px; /* Espaço para o header fixo */
+    /* Espaço para o header (80px) e para a sidebar (80px) */
+    padding: 60px 0 0 80px; 
+    transition: padding-left 0.3s ease-in-out;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .container {
     max-width: 900px;
-    margin: 20px auto;
+    /* Margin auto na horizontal não é mais necessário com a sidebar */
+    margin: 20px; 
     background: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column; /* Garante que os filhos do container (h2, form, etc.) fiquem em coluna */
 }
 
 h2, h3 {
@@ -43,6 +53,11 @@ hr {
     display: flex;
     flex-direction: column; /* Coloca o label em cima do input */
 }
+
+/* Classes utilitárias para controlar o tamanho dos form-groups em uma form-row */
+.form-group.flex-1 { flex: 1; }
+.form-group.flex-2 { flex: 2; }
+.form-group.flex-3 { flex: 3; }
 
 /* --- ESTILOS PARA OS ELEMENTOS DO FORMULÁRIO --- */
 
@@ -87,47 +102,101 @@ button[type="submit"]:hover {
     background: #0056b3;
 }
 
-/* Estilo do Header que você já tinha */
-header {
-    background-color: #003366; /* Um azul mais escuro */
-    color: white;
-    padding: 15px 30px;
+/* --- NOVO MENU LATERAL (SIDEBAR) --- */
+.sidebar {
+    height: 100%;
+    width: 80px; /* Largura da barra recolhida */
     position: fixed;
+    z-index: 1000;
     top: 0;
     left: 0;
-    width: 100%;
-    z-index: 1000;
-    box-sizing: border-box;
+    background-color: #003366;
+    overflow-x: hidden;
+    padding-top: 60px; /* Espaço para o header não sobrepor */
+    transition: width 0.3s ease-in-out;
     display: flex;
-    align-items: center;
-    justify-content: space-between; /* Alinha o h1 à esquerda e o nav à direita */
+    flex-direction: column;
+    justify-content: space-between; /* Empurra o logout para baixo */
 }
 
-header h1 {
+.sidebar ul {
+    list-style: none;
+    padding: 0;
     margin: 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    text-decoration: none;
+    color: white;
+    white-space: nowrap; /* Impede que o texto quebre linha */
+}
+
+.sidebar a i {
+    min-width: 80px; /* Garante que o ícone fique centralizado na barra recolhida */
+    text-align: center;
     font-size: 1.5rem;
 }
 
-header nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    gap: 20px; /* Espaço entre os links */
+.sidebar a span {
+    opacity: 0; /* Esconde o texto por padrão */
+    transition: opacity 0.2s ease-in-out;
 }
 
-header nav a {
+/* Efeito de expansão com JavaScript */
+body.sidebar-expanded .sidebar {
+    width: 250px; /* Largura da barra expandida */
+}
+
+body.sidebar-expanded .sidebar a span {
+    opacity: 1; /* Mostra o texto quando expandido */
+    transition-delay: 0.1s; /* Pequeno delay para o texto aparecer */
+}
+
+/* --- HEADER SUPERIOR --- */
+header {
+    background-color: #003366; /* Um azul mais escuro */
     color: white;
+    padding: 10px 30px;
+    position: fixed;
+    top: 0;
+    left: 80px; /* Começa depois da sidebar recolhida */
+    width: calc(100% - 80px); /* Ocupa o resto da largura */
+    z-index: 999;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Para alinhar o botão de sair à direita */
+}
+
+header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.logout-button {
+    background-color: #ff8c00; /* Laranja */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
+    font-size: 0.9rem;
     transition: background-color 0.3s ease;
 }
 
-header nav a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.logout-button:hover {
+    background-color: #e67e00; /* Laranja mais escuro no hover */
 }
+
+.logo-link, .logo-link:hover {
+    color: white;
+    text-decoration: none;
+}
+
 .password-container {
     position: relative; /* Essencial para posicionar o ícone dentro dele */
     width: 100%;
@@ -141,4 +210,81 @@ header nav a:hover {
     transform: translateY(-50%); /* Centraliza verticalmente o ícone */
     cursor: pointer; /* Muda o cursor para uma "mãozinha" */
     color: #888; /* Cor cinza para o ícone */
+}
+
+/* --- AJUSTES DE LAYOUT QUANDO A SIDEBAR EXPANDE --- */
+body.sidebar-expanded {
+    padding-left: 250px; /* Aumenta o padding do body */
+}
+
+body.sidebar-expanded header {
+    left: 250px; /* Empurra o header para a direita */
+    width: calc(100% - 250px); /* Ajusta a largura do header */
+}
+
+/* =============================================== */
+/* ESTILOS DO PAINEL DE CONTROLE                   */
+/* =============================================== */
+
+.painel-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%; 
+    flex-grow: 1;
+    align-content: flex-start;
+}
+
+.widget {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9e9e9; 
+    text-align: left;
+    flex: 1 1 300px;
+    max-width: 450px;
+}
+
+.widget h2, .widget h3 {
+    text-align: center;
+    margin-top: 0;
+    color: #333;
+}
+
+/* =============================================== */
+/* ESTILOS PARA PÁGINAS DE AUTENTICAÇÃO (LOGIN, ETC) */
+/* =============================================== */
+
+/* Body para centralizar o conteúdo na tela */
+body.auth-page {
+    padding: 20px; /* Remove o padding do layout principal e adiciona um respiro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f2f5; /* Um cinza um pouco diferente para destacar */
+}
+
+/* Ajustes no container para essas páginas */
+body.auth-page .container {
+    flex-grow: 0; /* Impede que o container cresça para preencher a tela */
+    max-width: 450px; /* Define uma largura máxima padrão */
+    width: 100%;
+    margin: 0; /* Remove a margem padrão que o .container tem */
+    flex-direction: column; /* Garante que o conteúdo dentro do container fique em coluna */
+}
+
+/* --- ESTILOS PARA MENSAGENS DE FEEDBACK (ERRO, SUCESSO) --- */
+.form-message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.form-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
