@@ -1,5 +1,9 @@
-# Ignorar a pasta de dependências do Composer
+# Arquivo de variáveis de ambiente. Contém senhas e chaves secretas!
+# NUNCA envie este arquivo para o repositório.
+.env
+
+# Arquivos de dependências do Composer
 /vendor/
 
-# Ignorar o arquivo de variáveis de ambiente
-.env
+# Pasta com arquivos enviados pelos usuários (fotos, documentos, etc.)
+/uploads/
