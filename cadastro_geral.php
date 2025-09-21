@@ -18,6 +18,17 @@ if (isset($_GET['reset'])) {
 <p>Passo <?php echo $step; ?> de 2</p>
 
 <?php
+// Exibe mensagens de erro do upload, se houver
+if (isset($_SESSION['upload_error'])) {
+    // Adicione a classe .error-message ao seu CSS com um fundo vermelho e texto branco
+    echo '<div style="background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;">' 
+            . htmlspecialchars($_SESSION['upload_error']) . 
+         '</div>';
+    unset($_SESSION['upload_error']); // Limpa a mensagem para não exibir novamente
+}
+?>
+
+<?php
 // Exibe o formulário correspondente ao passo atual
 if ($step == 1) {
 // PASSO 1: FORMULÁRIO DO RESPONSÁVEL
@@ -362,4 +373,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<?php require '../templates/footer.php'; ?>
+<?php require 'templates/footer.php'; ?>

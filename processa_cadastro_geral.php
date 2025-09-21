@@ -56,22 +56,54 @@ if ($step == 1) {
     $caminho_foto = null; // Inicia a variável da foto como nula
 
     // --- LÓGICA DE UPLOAD DA FOTO ---
-    if (isset($_FILES['foto_aluno']) && $_FILES['foto_aluno']['error'] == 0) {
+    // Verifica se um arquivo foi enviado (UPLOAD_ERR_NO_FILE significa que o campo foi deixado em branco)
+    if (isset($_FILES['foto_aluno']) && $_FILES['foto_aluno']['error'] !== UPLOAD_ERR_NO_FILE) {
         $upload_dir = 'uploads/fotos_alunos/';
-        $arquivo_tmp = $_FILES['foto_aluno']['tmp_name'];
-        $nome_original = $_FILES['foto_aluno']['name'];
-        $extensao = strtolower(pathinfo($nome_original, PATHINFO_EXTENSION));
-        $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
 
-        if (in_array($extensao, $extensoes_permitidas)) {
-            $nome_limpo = strtolower($nome_aluno);
-            $nome_limpo = preg_replace('/[^a-z0-9]+/', '-', $nome_limpo);
-            $nome_limpo = trim($nome_limpo, '-');
-            $novo_nome_arquivo = $nome_limpo . '-' . uniqid() . '.' . $extensao;
-            $caminho_completo = $upload_dir . $novo_nome_arquivo;
-            if (move_uploaded_file($arquivo_tmp, $caminho_completo)) {
-                $caminho_foto = $novo_nome_arquivo;
+        // VERIFICA SE O DIRETÓRIO DE UPLOAD EXISTE, SE NÃO, TENTA CRIAR
+        if (!is_dir($upload_dir)) {
+            if (!mkdir($upload_dir, 0775, true)) {
+                 error_log("Falha ao criar o diretório de upload: " . $upload_dir . ". Verifique as permissões e o SELinux.");
             }
+        }
+
+        // Verifica se houve algum erro no upload (tamanho do arquivo, etc.)
+        if ($_FILES['foto_aluno']['error'] === UPLOAD_ERR_OK) {
+            $arquivo_tmp = $_FILES['foto_aluno']['tmp_name'];
+            $nome_original = $_FILES['foto_aluno']['name'];
+            $extensao = strtolower(pathinfo($nome_original, PATHINFO_EXTENSION));
+            $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
+
+            if (in_array($extensao, $extensoes_permitidas)) {
+                if (is_writable($upload_dir)) {
+                    $nome_limpo = strtolower($nome_aluno);
+                    $nome_limpo = preg_replace('/[^a-z0-9]+/', '-', $nome_limpo);
+                    $nome_limpo = trim($nome_limpo, '-');
+                    $novo_nome_arquivo = $nome_limpo . '-' . uniqid() . '.' . $extensao;
+                    $caminho_completo = $upload_dir . $novo_nome_arquivo;
+                    if (move_uploaded_file($arquivo_tmp, $caminho_completo)) {
+                        $caminho_foto = $novo_nome_arquivo;
+                    } else {
+                        $_SESSION['upload_error'] = "Erro crítico: Não foi possível salvar a foto. Verifique as permissões do servidor (SELinux).";
+                        error_log("Falha ao mover o arquivo de upload para: " . $caminho_completo);
+                        header('Location: cadastro_geral.php');
+                        exit;
+                    }
+                } else {
+                    $_SESSION['upload_error'] = "Erro de configuração: O diretório de upload não tem permissão de escrita.";
+                    error_log("Diretório de upload sem permissão de escrita: " . $upload_dir);
+                    header('Location: cadastro_geral.php');
+                    exit;
+                }
+            } else {
+                $_SESSION['upload_error'] = "Tipo de arquivo inválido. Por favor, envie apenas imagens JPG, JPEG ou PNG.";
+                header('Location: cadastro_geral.php');
+                exit;
+            }
+        } else {
+            $_SESSION['upload_error'] = "Ocorreu um erro durante o upload da foto. Verifique o tamanho do arquivo. (Erro: " . $_FILES['foto_aluno']['error'] . ")";
+            header('Location: cadastro_geral.php');
+            exit;
         }
     }
 
@@ -119,7 +151,9 @@ if ($step == 1) {
         $pdo->rollBack();
         unset($_SESSION['step']);
         unset($_SESSION['dados_responsavel']);
-        die("Erro ao cadastrar: " . $e->getMessage());
+        $_SESSION['upload_error'] = "Erro no banco de dados ao tentar salvar o cadastro. Detalhe: " . $e->getMessage();
+        header('Location: cadastro_geral.php');
+        exit;
     }
 }
 ?>
