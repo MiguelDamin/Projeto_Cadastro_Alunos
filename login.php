@@ -15,8 +15,14 @@
     <div class="container" style="max-width: 400px;">
         <h2>Acessar o Sistema</h2>
         
-        <?php if (isset($_GET['erro'])): ?>
-            <p style="color: red; text-align: center;">Email ou senha inválidos!</p>
+        <?php if (isset($_GET['erro']) && $_GET['erro'] == 1): ?>
+            <p style="color: red; text-align: center;">E-mail ou senha inválidos!</p>
+        <?php elseif (isset($_GET['erro']) && $_GET['erro'] == 'inativo'): ?>
+            <p style="color: #ff8c00; text-align: center;">Este usuário está inativo. Contate o administrador.</p>
+        <?php elseif (isset($_GET['erro']) && $_GET['erro'] == 'bloqueado'): 
+            $tempo = isset($_GET['tempo']) ? htmlspecialchars($_GET['tempo']) : '15';
+        ?>
+            <p style="color: red; text-align: center;">Conta bloqueada por excesso de tentativas. Tente novamente em <?php echo $tempo; ?> minutos.</p>
         <?php endif; ?>
 
         <form action="processa_login.php" method="POST">
