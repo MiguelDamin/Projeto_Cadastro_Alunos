@@ -84,23 +84,27 @@ if ($step == 1) {
                     if (move_uploaded_file($arquivo_tmp, $caminho_completo)) {
                         $caminho_foto = $novo_nome_arquivo;
                     } else {
+                        $_SESSION['form_data_aluno'] = $_POST; // Salva dados do form
                         $_SESSION['upload_error'] = "Erro crítico: Não foi possível salvar a foto. Verifique as permissões do servidor (SELinux).";
                         error_log("Falha ao mover o arquivo de upload para: " . $caminho_completo);
                         header('Location: cadastro_geral.php');
                         exit;
                     }
                 } else {
+                    $_SESSION['form_data_aluno'] = $_POST; // Salva dados do form
                     $_SESSION['upload_error'] = "Erro de configuração: O diretório de upload não tem permissão de escrita.";
                     error_log("Diretório de upload sem permissão de escrita: " . $upload_dir);
                     header('Location: cadastro_geral.php');
                     exit;
                 }
             } else {
+                $_SESSION['form_data_aluno'] = $_POST; // Salva dados do form
                 $_SESSION['upload_error'] = "Tipo de arquivo inválido. Por favor, envie apenas imagens JPG, JPEG ou PNG.";
                 header('Location: cadastro_geral.php');
                 exit;
             }
         } else {
+            $_SESSION['form_data_aluno'] = $_POST; // Salva dados do form
             $_SESSION['upload_error'] = "Ocorreu um erro durante o upload da foto. Verifique o tamanho do arquivo. (Erro: " . $_FILES['foto_aluno']['error'] . ")";
             header('Location: cadastro_geral.php');
             exit;
@@ -143,15 +147,19 @@ if ($step == 1) {
 
         unset($_SESSION['step']);
         unset($_SESSION['dados_responsavel']);
+        unset($_SESSION['form_data_aluno']); // Limpa também os dados do formulário do aluno
 
         header("Location: painel.php?sucesso=cadastro_completo");
         exit;
 
     } catch (PDOException $e) {
         $pdo->rollBack();
-        unset($_SESSION['step']);
-        unset($_SESSION['dados_responsavel']);
-        $_SESSION['upload_error'] = "Erro no banco de dados ao tentar salvar o cadastro. Detalhe: " . $e->getMessage();
+        // Não limpa os dados da sessão para que o usuário possa tentar novamente.
+        $_SESSION['form_data_aluno'] = $_POST; // Salva os dados do aluno que falharam
+        // Em produção, é melhor uma mensagem genérica. Para debug, $e->getMessage() é útil.
+        $_SESSION['upload_error'] = "Erro no banco de dados ao tentar salvar o cadastro. Tente novamente.";
+        // Loga o erro real para o desenvolvedor
+        error_log("PDOException em processa_cadastro_geral.php: " . $e->getMessage());
         header('Location: cadastro_geral.php');
         exit;
     }

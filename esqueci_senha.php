@@ -5,8 +5,8 @@
     <title>Recuperar Senha</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <div class="container" style="max-width: 400px;">
+<body class="auth-page">
+    <div class="container">
         <h2>Recuperar Senha</h2>
         <p>Digite seu e-mail cadastrado e enviaremos um link para você redefinir sua senha.</p>
         

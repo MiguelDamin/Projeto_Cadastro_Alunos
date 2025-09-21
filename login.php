@@ -8,11 +8,11 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
+<body class="auth-page">
 <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'senha_redefinida'): ?>
     <p style="color: green; text-align: center;">Senha redefinida com sucesso! Você já pode fazer o login.</p>
 <?php endif; ?>
-    <div class="container" style="max-width: 400px;">
+    <div class="container">
         <h2>Acessar o Sistema</h2>
         
         <?php if (isset($_GET['erro']) && $_GET['erro'] == 1): ?>

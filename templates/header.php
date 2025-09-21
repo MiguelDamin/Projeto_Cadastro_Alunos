@@ -21,18 +21,28 @@ if (!isset($_SESSION['usuario_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão Escolar</title>
+    <!-- Link para o CSS do Font Awesome (ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<header>
-    <h1>Sistema Escolar</h1>
-    <nav>
+<body>
+    <nav class="sidebar">
         <ul>
-            <li><a href="painel.php">Painel</a></li>
-            <li><a href="cadastro_geral.php?reset=1">Novo Cadastro</a></li>
-            <li><a href="cadastro_turma.php">Cadastrar Turma</a></li>
-            <li><a href="logout.php" style="color: #ffc107;">Sair (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</a></li>
+            <!-- <li><a href="painel.php" title="Painel"><i class="fas fa-tachometer-alt"></i> <span>Painel</span></a></li> -->
+            <li><a href="cadastro_geral.php?reset=1" title="Cadastro de aluno"><i class="fas fa-user-plus"></i> <span>Cadastro de Aluno</span></a></li>
+            <li><a href="cadastro_turma.php" title="Cadastrar Turma"><i class="fas fa-users"></i> <span>Cadastrar Turma</span></a></li>
+            <!-- Adicione outros links aqui -->
+        </ul>
+        <ul class="logout-section">
+             <li><a href="logout.php" title="Sair"><i class="fas fa-sign-out-alt"></i> <span>Sair (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</span></a></li>
         </ul>
     </nav>
-</header>
-<body>
+
+    <header>
+        <a href="painel.php" class="logo-link">
+            <h1>Sistema Escolar</h1>
+        </a>
+        <a href="logout.php" class="logout-button">Sair</a>
+    </header>
+
     <div class="container">
