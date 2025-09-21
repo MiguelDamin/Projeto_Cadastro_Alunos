@@ -117,7 +117,7 @@ if ($step == 1) {
         <label for="email_aluno">E-mail (opcional):</label>
         <input type="email" placeholder="Email aluno" name="email_aluno" id="email_aluno"><br><br>
 
-        <label for="cpf_aluno">CPF (opcional):</label>
+        <label for="cpf_aluno">CPF:</label>
         <input type="text" placeholder="XXX.XXX.XXX-XX" name="cpf_aluno" id="cpf_aluno"><br><br>
 
         <label for="foto_aluno">Foto do Aluno (opcional):</label>
