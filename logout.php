@@ -1,4 +1,8 @@
 <?php
+// Define o tempo de vida do cookie da sessão para 2 horas
+$tempo_limite_sessao = 7200;
+session_set_cookie_params($tempo_limite_sessao);
+
 // 1. Inicia a sessão
 session_start();
 

@@ -1,10 +1,18 @@
 <?php
-// Preencha com os dados do seu banco de dados
-$host = "ballast.proxy.rlwy.net";      
-$user = "root";      
-$pass = "gakUZoQlkPfWBiXEmEtGbvhLHCdvKuxH";  
-$db   = "sistema_escolar";  
-$port = 15574;        
+// --- CARREGAMENTO DE VARIÁVEIS DE AMBIENTE ---
+// Inclui o autoloader do Composer para carregar a biblioteca DotEnv
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Carrega as variáveis do arquivo .env para o ambiente
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// --- DADOS DE CONEXÃO VINDOS DO ARQUIVO .ENV ---
+$host = $_ENV['DB_HOST'];
+$user = $_ENV['DB_USERNAME'];
+$pass = $_ENV['DB_PASSWORD'];
+$db   = $_ENV['DB_DATABASE'];
+$port = $_ENV['DB_PORT'];
 $charset = 'utf8mb4'; // Essencial para suportar todos os caracteres
 
 // DSN (Data Source Name) para a conexão PDO

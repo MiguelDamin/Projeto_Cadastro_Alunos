@@ -1,5 +1,11 @@
 <?php
-// Inicia a sessão em todas as páginas
+// --- CONTROLE DE TEMPO DA SESSÃO ---
+// Define o tempo de vida do cookie da sessão em segundos.
+// Ex: 3600 = 1 hora. 7200 = 2 horas. 86400 = 1 dia.
+$tempo_limite_sessao = 7200; // Definimos 2 horas
+session_set_cookie_params($tempo_limite_sessao);
+
+// Inicia a sessão (ou continua a sessão existente com o novo tempo de vida)
 session_start();
 
 // Verifica se o usuário está logado
