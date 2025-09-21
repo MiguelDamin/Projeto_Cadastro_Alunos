@@ -41,50 +41,66 @@ if ($step == 1) {
     exit;
 
 } elseif ($step == 2) {
-    // --- PROCESSANDO DADOS DO PASSO 2 (ALUNO) E SALVANDO TUDO ---
-
+    // Recupera os dados do responsável da sessão
     $dados_responsavel = $_SESSION['dados_responsavel'];
     
+    // Pega os dados do aluno do formulário
     $nome_aluno = $_POST['nome_completo_aluno'];
     $data_nascimento_aluno = $_POST['data_nascimento_aluno'];
     $email_aluno = $_POST['email_aluno'] ?: null;
     $cpf_aluno = $_POST['cpf_aluno'] ?: null;
-    
-    $pdo->beginTransaction();
+    $caminho_foto = null; // Inicia a variável da foto como nula
 
+    // --- LÓGICA DE UPLOAD DA FOTO ---
+    if (isset($_FILES['foto_aluno']) && $_FILES['foto_aluno']['error'] == 0) {
+        $upload_dir = 'uploads/fotos_alunos/';
+        $arquivo_tmp = $_FILES['foto_aluno']['tmp_name'];
+        $nome_original = $_FILES['foto_aluno']['name'];
+        $extensao = strtolower(pathinfo($nome_original, PATHINFO_EXTENSION));
+        $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
+
+        if (in_array($extensao, $extensoes_permitidas)) {
+            $nome_limpo = strtolower($nome_aluno);
+            $nome_limpo = preg_replace('/[^a-z0-9]+/', '-', $nome_limpo);
+            $nome_limpo = trim($nome_limpo, '-');
+            $novo_nome_arquivo = $nome_limpo . '-' . uniqid() . '.' . $extensao;
+            $caminho_completo = $upload_dir . $novo_nome_arquivo;
+            if (move_uploaded_file($arquivo_tmp, $caminho_completo)) {
+                $caminho_foto = $novo_nome_arquivo;
+            }
+        }
+    }
+
+    $pdo->beginTransaction();
     try {
-        // 1. INSERE O RESPONSÁVEL com TODOS os campos
-        $sql_resp = "INSERT INTO responsaveis 
-                        (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        // 1. INSERE O RESPONSÁVEL (código que você já tem)
+        $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_resp = $pdo->prepare($sql_resp);
-        
         $stmt_resp->execute([
-            $dados_responsavel['nome_completo_resp'],
-            $dados_responsavel['cpf_resp'],
-            $dados_responsavel['email_resp'],
-            $dados_responsavel['telefone_resp'],
-            $dados_responsavel['cep_resp'],
-            $dados_responsavel['logradouro_resp'],
-            $dados_responsavel['numero_resp'],
-            $dados_responsavel['complemento_resp'],
-            $dados_responsavel['bairro_resp'],
-            $dados_responsavel['cidade_resp'],
+            $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
+            $dados_responsavel['email_resp'], $dados_responsavel['telefone_resp'],
+            $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
+            $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
+            $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
             $dados_responsavel['uf_resp']
         ]);
 
         $id_responsavel = $pdo->lastInsertId();
 
-        // 2. INSERE O ALUNO
-        $sql_aluno = "INSERT INTO alunos (nome_completo, data_nascimento, email, cpf, id_responsavel_principal) VALUES (?, ?, ?, ?, ?)";
+        // 2. INSERE O ALUNO (COM A CORREÇÃO)
+        // Adicionamos a coluna `caminho_foto` e um `?` a mais
+        $sql_aluno = "INSERT INTO alunos (nome_completo, data_nascimento, email, cpf, id_responsavel_principal, caminho_foto) VALUES (?, ?, ?, ?, ?, ?)"; // <-- MUDANÇA AQUI
+        
         $stmt_aluno = $pdo->prepare($sql_aluno);
-        $stmt_aluno->execute([
+        
+        // Adicionamos a variável $caminho_foto no final do array
+        $stmt_aluno->execute([ // <-- MUDANÇA AQUI
             $nome_aluno,
             $data_nascimento_aluno,
             $email_aluno,
             $cpf_aluno,
-            $id_responsavel
+            $id_responsavel,
+            $caminho_foto // A variável com o nome do arquivo da foto
         ]);
 
         $pdo->commit();

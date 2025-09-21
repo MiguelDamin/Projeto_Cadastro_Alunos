@@ -104,8 +104,9 @@ if ($step == 1) {
         (<a href="cadastro_geral.php?reset=1">Alterar</a>)
     </p>
 
-    <form action="processa_cadastro_geral.php" method="POST">
+    <form action="processa_cadastro_geral.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="step" value="2">
+
 
         <label for="nome_completo_aluno">Nome Completo do Aluno:</label>
         <input type="text" placeholder="Nome completo do aluno" name="nome_completo_aluno" id="nome_completo_aluno" required><br><br>
@@ -118,6 +119,14 @@ if ($step == 1) {
 
         <label for="cpf_aluno">CPF (opcional):</label>
         <input type="text" placeholder="XXX.XXX.XXX-XX" name="cpf_aluno" id="cpf_aluno"><br><br>
+
+        <label for="foto_aluno">Foto do Aluno (opcional):</label>
+    
+        <img id="foto-preview" src="#" alt="Preview da foto" style="max-width: 150px; display: none; margin-bottom: 10px; border-radius: 50%;">
+        
+        <input type="file" name="foto_aluno" id="foto_aluno" accept="image/png, image/jpeg">
+        <small>Formatos aceitos: JPG, PNG.</small>
+        <br><br>
 
         <button type="submit">Finalizar Cadastro</button>
     </form>
@@ -327,5 +336,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<script>
+    const inputFoto = document.getElementById('foto_aluno');
+    const previewFoto = document.getElementById('foto-preview');
+
+    if (inputFoto && previewFoto) {
+        inputFoto.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                previewFoto.style.display = 'block'; // Mostra o campo da imagem
+                
+                reader.onload = function(event) {
+                    previewFoto.setAttribute('src', event.target.result);
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                previewFoto.style.display = 'none'; // Esconde se nenhum arquivo for selecionado
+            }
+        });
+    }
+</script>
+
 
 <?php require '../templates/footer.php'; ?>
