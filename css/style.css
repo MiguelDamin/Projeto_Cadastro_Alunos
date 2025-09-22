@@ -288,3 +288,173 @@ body.auth-page .container {
     background-color: #f8d7da;
     border-color: #f5c6cb;
 }
+/* ========================================================= */
+/* ESTILOS MODERNOS PARA PÁGINAS DE AUTENTICAÇÃO (LOGIN, ETC) */
+/* ========================================================= */
+
+/* Body para centralizar o conteúdo na tela */
+body.auth-page {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f4f8; /* Fundo azul-acinzentado claro */
+    font-family: 'Poppins', Arial, sans-serif; /* Sugestão de uma fonte mais moderna */
+}
+
+/* Container principal da autenticação */
+.auth-container {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    flex-grow: 0;
+    margin: 0;
+}
+
+/* Ícone no topo */
+.auth-icon {
+    width: 70px;
+    height: 70px;
+    background-color: #0056e0; /* Azul primário vibrante */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+    color: white;
+    font-size: 30px;
+}
+
+/* Títulos */
+.auth-container h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.auth-container .auth-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+/* Agrupamento de label e input */
+.auth-container .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Labels */
+.auth-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+/* Inputs de texto, email e senha */
+.auth-container input[type="text"],
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e1; /* Borda sutil */
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-container input:focus {
+    border-color: #0056e0;
+    box-shadow: 0 0 0 3px rgba(0, 86, 224, 0.1);
+    outline: none;
+}
+
+/* Container do input de senha para posicionar o ícone */
+.auth-container .password-container {
+    position: relative;
+    width: 100%;
+}
+
+.auth-container .password-container i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #94a3b8; /* Cor mais suave para o ícone */
+}
+
+/* Botão de submit */
+.auth-container button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background: #0056e0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.auth-container button[type="submit"]:hover {
+    background: #004ac7; /* Tom de azul um pouco mais escuro */
+}
+
+.auth-container button[type="submit"]:active {
+    transform: scale(0.99); /* Efeito de clique */
+}
+
+/* Link "Esqueci minha senha" */
+.auth-links {
+    margin-top: 25px;
+}
+
+.auth-links a {
+    color: #0056e0;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+/* Mensagens de feedback (erro, sucesso) */
+.message-area {
+    min-height: 25px; /* Evita que o layout "pule" quando a mensagem aparece */
+    margin-bottom: 15px;
+}
+
+.form-message {
+    padding: 10px;
+    margin: 0;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.form-message.success {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+.form-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+}
+
+.form-message.warning {
+    color: #856404;
+    background-color: #fff3cd;
+}
