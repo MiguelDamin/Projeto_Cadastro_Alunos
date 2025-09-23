@@ -35,7 +35,7 @@ if (!isset($_SESSION['usuario_id'])) {
                 </a>
                 <ul class="submenu">
                     <li><a href="cadastro_geral.php?reset=1"><i class="fas fa-user-plus"></i><span>Cadastrar Aluno</span></a></li>
-                    <li><a href="#"><i class="fas fa-chalkboard-teacher"></i><span>Cadastrar Professores</span></a></li>
+                    <li><a href="cadastro_professor.php?reset=1"><i class="fas fa-chalkboard-teacher"></i><span>Cadastrar Professores</span></a></li>
                     <li><a href="#"><i class="fas fa-school"></i><span>Cadastrar Turmas</span></a></li>
                 </ul>
             </li>
