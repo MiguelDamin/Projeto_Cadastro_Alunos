@@ -50,6 +50,7 @@ if (!isset($_SESSION['usuario_id'])) {
                     <li><a href="#"><i class="fas fa-file-alt"></i><span>Relatório de Turmas</span></a></li>
                 </ul>
             </li>
+
         </ul>
     </nav>
 
