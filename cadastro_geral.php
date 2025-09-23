@@ -41,131 +41,135 @@ if ($form_error) {
 }
 ?>
 
-<?php
-// Exibe o formulário correspondente ao passo atual
-if ($step == 1) {
-// PASSO 1: FORMULÁRIO DO RESPONSÁVEL
-?>
-<h3>Dados do Responsável</h3>
-<form action="processa_cadastro_geral.php" method="POST">
-    <input type="hidden" name="step" value="1">
 
-    <div class="form-row">
-        <div class="form-group">
-            <label for="nome_completo_resp">Nome Completo:</label>
-            <input type="text" placeholder="Nome completo do responsável" name="nome_completo_resp" id="nome_completo_resp" value="<?php echo htmlspecialchars($dados_responsavel['nome_completo_resp'] ?? ''); ?>" required>
+<!-- // Exibe o formulário correspondente ao passo atual -->
+<?php if ($step == 1): // PASSO 1: FORMULÁRIO DO RESPONSÁVEL ?>
+<div class="form-card">
+    <form action="processa_cadastro_geral.php" method="POST">
+        <input type="hidden" name="step" value="1">
+        
+        <h3>Dados do Responsável</h3>
+        <p>Preencha as informações do responsável pelo aluno que será cadastrado.</p>
+        
+        <h4>Dados Pessoais</h4>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nome_completo_resp">Nome Completo *</label>
+                <input type="text" placeholder="Digite o nome completo" name="nome_completo_resp" id="nome_completo_resp" value="<?php echo htmlspecialchars($dados_responsavel['nome_completo_resp'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="cpf_resp">CPF *</label>
+                <input type="text" placeholder="000.000.000-00" name="cpf_resp" id="cpf_resp" value="<?php echo htmlspecialchars($dados_responsavel['cpf_resp'] ?? ''); ?>" required>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="cpf_resp">CPF:</label>
-            <input type="text" placeholder="000.000.000-00" name="cpf_resp" id="cpf_resp" value="<?php echo htmlspecialchars($dados_responsavel['cpf_resp'] ?? ''); ?>" required>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email_resp">E-mail *</label>
+                <input type="email" placeholder="email@exemplo.com" name="email_resp" id="email_resp" value="<?php echo htmlspecialchars($dados_responsavel['email_resp'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone_resp">Telefone</label>
+                <input type="text" placeholder="(00) 90000-0000" name="telefone_resp" id="telefone_resp" value="<?php echo htmlspecialchars($dados_responsavel['telefone_resp'] ?? ''); ?>">
+            </div>
         </div>
+
+        <h4>Endereço</h4>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cep_resp">CEP *</label>
+                <input type="text" placeholder="00000-000" name="cep_resp" id="cep_resp" value="<?php echo htmlspecialchars($dados_responsavel['cep_resp'] ?? ''); ?>" maxlength="9" required>
+            </div>
+            <div class="form-group flex-2">
+                <label for="logradouro_resp">Logradouro (Rua/Avenida) *</label>
+                <input type="text" placeholder="Preenchido automaticamente" name="logradouro_resp" id="logradouro_resp" value="<?php echo htmlspecialchars($dados_responsavel['logradouro_resp'] ?? ''); ?>" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="numero_resp">Número *</label>
+                <input type="text" placeholder="123" name="numero_resp" id="numero_resp" value="<?php echo htmlspecialchars($dados_responsavel['numero_resp'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="complemento_resp">Complemento</label>
+                <input type="text" placeholder="Apto, Casa, etc." name="complemento_resp" id="complemento_resp" value="<?php echo htmlspecialchars($dados_responsavel['complemento_resp'] ?? ''); ?>">
+            </div>
+             <div class="form-group">
+                <label for="bairro_resp">Bairro *</label>
+                <input type="text" placeholder="Preenchido automaticamente" name="bairro_resp" id="bairro_resp" value="<?php echo htmlspecialchars($dados_responsavel['bairro_resp'] ?? ''); ?>" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group flex-2">
+                <label for="cidade_resp">Cidade *</label>
+                <input type="text" placeholder="Preenchido automaticamente" name="cidade_resp" id="cidade_resp" value="<?php echo htmlspecialchars($dados_responsavel['cidade_resp'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group flex-1">
+                <label for="uf_resp">Estado (UF) *</label>
+                <input type="text" placeholder="UF" name="uf_resp" id="uf_resp" value="<?php echo htmlspecialchars($dados_responsavel['uf_resp'] ?? ''); ?>" required maxlength="2">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Próximo: Cadastrar Aluno <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </form>
+</div>
+<?php endif; ?>
+
+<?php if ($step == 2): // PASSO 2: FORMULÁRIO DO ALUNO ?>
+<div class="form-card">
+    <div class="responsavel-info">
+        <span>Responsável: <strong><?php echo htmlspecialchars($_SESSION['dados_responsavel']['nome_completo_resp']); ?></strong></span>
+        <a href="cadastro_geral.php?back_to_step=1">Alterar</a>
     </div>
-
-    <div class="form-row">
-        <div class="form-group">
-            <label for="email_resp">E-mail:</label>
-            <input type="email" placeholder="email@exemplo.com" name="email_resp" id="email_resp" value="<?php echo htmlspecialchars($dados_responsavel['email_resp'] ?? ''); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="telefone_resp">Telefone:</label>
-            <input type="text" placeholder="(00) 90000-0000" name="telefone_resp" id="telefone_resp" value="<?php echo htmlspecialchars($dados_responsavel['telefone_resp'] ?? ''); ?>">
-        </div>
-    </div>
-
-    <hr>
-    <h4>Endereço</h4>
-
-    <div class="form-row">
-        <div class="form-group">
-            <label for="cep_resp">CEP:</label>
-            <input type="text" placeholder="00000-000" name="cep_resp" id="cep_resp" value="<?php echo htmlspecialchars($dados_responsavel['cep_resp'] ?? ''); ?>" maxlength="9">
-            <small id="cep-status" style="display: none; color: #666;"></small>
-        </div>
-        <div class="form-group">
-            <label for="logradouro_resp">Logradouro (Rua/Avenida):</label>
-            <input type="text" placeholder="Preenchido automaticamente" name="logradouro_resp" id="logradouro_resp" value="<?php echo htmlspecialchars($dados_responsavel['logradouro_resp'] ?? ''); ?>" required>
-        </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group">
-            <label for="numero_resp">Número:</label>
-            <input type="text" name="numero_resp" id="numero_resp" value="<?php echo htmlspecialchars($dados_responsavel['numero_resp'] ?? ''); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="complemento_resp">Complemento (opcional):</label>
-            <input type="text" name="complemento_resp" id="complemento_resp" value="<?php echo htmlspecialchars($dados_responsavel['complemento_resp'] ?? ''); ?>">
-        </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group flex-2">
-            <label for="bairro_resp">Bairro:</label>
-            <input type="text" placeholder="Preenchido automaticamente" name="bairro_resp" id="bairro_resp" value="<?php echo htmlspecialchars($dados_responsavel['bairro_resp'] ?? ''); ?>" required>
-        </div>
-        <div class="form-group flex-2">
-            <label for="cidade_resp">Cidade:</label>
-            <input type="text" placeholder="Preenchido automaticamente" name="cidade_resp" id="cidade_resp" value="<?php echo htmlspecialchars($dados_responsavel['cidade_resp'] ?? ''); ?>" required>
-        </div>
-        <div class="form-group flex-1">
-            <label for="uf_resp">Estado (UF):</label>
-            <input type="text" placeholder="UF" name="uf_resp" id="uf_resp" value="<?php echo htmlspecialchars($dados_responsavel['uf_resp'] ?? ''); ?>" required maxlength="2">
-        </div>
-    </div>
-
-    <button type="submit">Próximo: Cadastrar Aluno</button>
-</form>
-
-<?php
-} elseif ($step == 2) {
-// PASSO 2: FORMULÁRIO DO ALUNO
-?>
-
-    <h3>Dados do Aluno</h3>
-    <p>
-        <strong>Responsável:</strong> 
-        <?php echo htmlspecialchars($_SESSION['dados_responsavel']['nome_completo_resp']); ?>
-        (<a href="cadastro_geral.php?back_to_step=1">Alterar</a>)
-    </p>
 
     <form action="processa_cadastro_geral.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="step" value="2">
+        
+        <h3>Dados do Aluno</h3>
+        <p>Agora, preencha as informações do aluno.</p>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="nome_completo_aluno">Nome Completo do Aluno:</label>
+                <label for="nome_completo_aluno">Nome Completo do Aluno *</label>
                 <input type="text" placeholder="Nome completo do aluno" name="nome_completo_aluno" id="nome_completo_aluno" value="<?php echo htmlspecialchars($form_data_aluno['nome_completo_aluno'] ?? ''); ?>" required>
             </div>
             <div class="form-group">
-                <label for="data_nascimento_aluno">Data de Nascimento:</label>
+                <label for="data_nascimento_aluno">Data de Nascimento *</label>
                 <input type="date" name="data_nascimento_aluno" id="data_nascimento_aluno" value="<?php echo htmlspecialchars($form_data_aluno['data_nascimento_aluno'] ?? ''); ?>" required>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="email_aluno">E-mail (opcional):</label>
+                <label for="email_aluno">E-mail (opcional)</label>
                 <input type="email" placeholder="email.aluno@exemplo.com" name="email_aluno" id="email_aluno" value="<?php echo htmlspecialchars($form_data_aluno['email_aluno'] ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="cpf_aluno">CPF (opcional):</label>
+                <label for="cpf_aluno">CPF (opcional)</label>
                 <input type="text" placeholder="000.000.000-00" name="cpf_aluno" id="cpf_aluno" value="<?php echo htmlspecialchars($form_data_aluno['cpf_aluno'] ?? ''); ?>">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="foto_aluno">Foto do Aluno (opcional):</label>
-            <img id="foto-preview" src="#" alt="Preview da foto" style="max-width: 150px; display: none; margin-bottom: 10px; border-radius: 50%;">
-            <input type="file" name="foto_aluno" id="foto_aluno" accept="image/png, image/jpeg">
-            <small>Formatos aceitos: JPG, PNG.</small>
+            <label>Foto do Aluno (opcional)</label>
+            <div class="file-upload-wrapper">
+                <img id="foto-preview" src="#" alt="Preview da foto" style="display: none;">
+                <label for="foto_aluno" class="file-upload-label">
+                    <i class="fas fa-camera"></i>
+                    <span>Clique para enviar uma imagem</span>
+                    <small>JPG, PNG até 2MB</small>
+                </label>
+                <input type="file" name="foto_aluno" id="foto_aluno" accept="image/png, image/jpeg">
+            </div>
         </div>
 
-        <button type="submit">Finalizar Cadastro</button>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Finalizar Cadastro <i class="fas fa-check"></i></button>
+        </div>
     </form>
-
-<?php
-}
-?>
+</div>
+<?php endif; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

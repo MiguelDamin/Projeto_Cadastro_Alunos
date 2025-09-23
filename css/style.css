@@ -456,3 +456,208 @@ body.auth-page {
     color: #856404;
     background-color: #fff3cd;
 }
+/* =================================================================== */
+/* 5. PÁGINA ESPECÍFICA: CADASTRO MULTI-ETAPAS                        */
+/* =================================================================== */
+
+/* --- Cabeçalho da Página de Cadastro --- */
+.page-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.page-top-header h2 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: #1e293b;
+}
+.page-top-header p {
+    margin: 0;
+    color: #64748b;
+}
+.back-link {
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+}
+.back-link i {
+    margin-right: 8px;
+}
+
+/* --- Stepper de Progresso --- */
+.stepper-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+.stepper-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #a0aec0; /* Cinza para passos inativos */
+    width: 150px;
+    text-align: center;
+}
+.stepper-counter {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border: 3px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+.stepper-title {
+    font-weight: 500;
+}
+.stepper-line {
+    width: 100%;
+    height: 2px;
+    background-color: #e2e8f0;
+    position: relative;
+    top: 20px;
+    transition: all 0.3s ease;
+}
+
+/* Estilos para passos concluídos/ativos */
+.stepper-item.completed {
+    color: #0056e0; /* Azul primário */
+}
+.stepper-item.completed .stepper-counter {
+    background-color: #ffffff;
+    border-color: #0056e0;
+    color: #0056e0;
+}
+.stepper-item.completed + .stepper-line {
+    background-color: #0056e0;
+}
+
+/* --- Card do Formulário --- */
+.form-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+.form-card h3 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin: 0 0 5px 0;
+}
+.form-card p {
+    color: #64748b;
+    margin: 0 0 30px 0;
+    max-width: 600px;
+}
+.form-card h4 {
+    font-size: 1.1rem;
+    color: #334155;
+    margin: 30px 0 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* --- Override nos Campos do Formulário --- */
+.form-card input[type="text"],
+.form-card input[type="email"],
+.form-card input[type="date"],
+.form-card input[type="password"] {
+    background-color: #f8fafc; /* Fundo cinza bem claro */
+    border: 1px solid #e2e8f0; /* Borda sutil */
+    padding: 12px;
+}
+.form-card input::placeholder {
+    color: #94a3b8;
+}
+.form-card input:focus {
+    background-color: #ffffff;
+    border-color: #0056e0;
+    box-shadow: 0 0 0 3px rgba(0, 86, 224, 0.1);
+}
+
+/* --- Botões e Ações --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Alinha o botão à direita */
+    margin-top: 30px;
+}
+.btn-primary { /* Classe específica para evitar conflito */
+    width: auto;
+    padding: 12px 25px;
+    background: #0056e0;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-primary:hover {
+    background: #004ac7;
+}
+
+/* --- Bloco de Informação do Responsável (Passo 2) --- */
+.responsavel-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f1f5f9;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+.responsavel-info a {
+    color: #0056e0;
+    font-weight: 600;
+}
+
+/* --- Estilização do Input de Arquivo --- */
+.file-upload-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.file-upload-wrapper input[type="file"] {
+    display: none; /* Esconde o input padrão feio */
+}
+.file-upload-label {
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    flex-grow: 1;
+    color: #64748b;
+}
+.file-upload-label:hover {
+    border-color: #0056e0;
+}
+.file-upload-label i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+.file-upload-label span {
+    font-weight: 600;
+    display: block;
+}
+#foto-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e2e8f0;
+}
+
+/* Mensagem de erro com mais espaço */
+.form-message.spaced {
+    margin-bottom: 20px;
+}
