@@ -30,7 +30,9 @@ if (!isset($_SESSION['usuario_id'])) {
         <ul>
             <!-- <li><a href="painel.php" title="Painel"><i class="fas fa-tachometer-alt"></i> <span>Painel</span></a></li> -->
             <li><a href="cadastro_geral.php?reset=1" title="Cadastro de aluno"><i class="fas fa-user-plus"></i> <span>Cadastro de Aluno</span></a></li>
+            <li><a href="cadastro_professor.php" title="Cadastrar Professor"><i class="fas fa-user-tie"></i> <span>Cadastrar Professor</span></a></li>
             <li><a href="cadastro_turma.php" title="Cadastrar Turma"><i class="fas fa-users"></i> <span>Cadastrar Turma</span></a></li>
+            <!-- Adicione outros links aqui -->
             <!-- Adicione outros links aqui -->
         </ul>
         <ul class="logout-section">
