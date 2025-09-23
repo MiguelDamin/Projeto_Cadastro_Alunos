@@ -1,34 +1,62 @@
 <?php 
-// Inclui o cabeçalho que já faz a verificação de login
+// Inclui o cabeçalho (header + sidebar)
 require 'templates/header.php'; 
 ?>
 
-<main class="painel-container">
+<head>
+    <title>Painel - Sistema Escolar</title>
+</head>
 
-    <div class="widget">
-        <h2>Bem-vindo!</h2>
-        <p>Olá, <strong><?php echo htmlspecialchars($_SESSION['usuario_nome']); ?></strong>.</p>
-        <p>Utilize o menu acima para navegar entre as funcionalidades do sistema.</p>
+<div class="page-header">
+    <h2>Olá, <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>!</h2>
+    <p>Bem-vindo ao sistema de gestão escolar. Aqui você pode gerenciar alunos, responsáveis e turmas.</p>
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="widget card">
+        <div class="widget-icon" style="background-color: #e0f7fa;">
+            <i class="fas fa-info-circle" style="color: #0097a7;"></i>
+        </div>
+        <div class="widget-content">
+            <h3>Bem-vindo!</h3>
+            <p>Utilize o menu lateral para navegar entre as funcionalidades.</p>
+        </div>
     </div>
 
-    <div class="widget">
-        <h3>Alunos Recentes</h3>
-        <p>Aqui você pode adicionar um resumo de alunos cadastrados, por exemplo.</p>
+    <div class="widget card">
+        <div class="widget-icon" style="background-color: #fff3e0;">
+            <i class="fas fa-users" style="color: #ff9800;"></i>
+        </div>
+        <div class="widget-content">
+            <h3>Alunos Recentes</h3>
+            <p>Resumo dos últimos alunos cadastrados no sistema.</p>
+        </div>
     </div>
 
-    <div class="widget">
-        <h3>Turmas</h3>
-        <p>Outra informação importante, como as últimas turmas criadas.</p>
+    <div class="widget card">
+        <div class="widget-icon" style="background-color: #e8f5e9;">
+            <i class="fas fa-chalkboard" style="color: #4caf50;"></i>
+        </div>
+        <div class="widget-content">
+            <h3>Turmas</h3>
+            <p>Informações sobre as últimas turmas criadas ou ativas.</p>
+        </div>
     </div>
 
-    <div class="widget">
-        <h3>Atalhos</h3>
-        <p>Um atalho para a funcionalidade mais usada.</p>
+    <div class="widget card">
+        <div class="widget-icon" style="background-color: #fce4ec;">
+            <i class="fas fa-bolt" style="color: #e91e63;"></i>
+        </div>
+        <div class="widget-content">
+            <h3>Atalhos</h3>
+            <p>Acesse rapidamente as funcionalidades mais utilizadas.</p>
+        </div>
     </div>
 
-</main>
+</div>
 
 <?php 
-// Inclui o rodapé
+// Inclui o rodapé (fecha as tags e adiciona o script da sidebar)
 require 'templates/footer.php'; 
 ?>

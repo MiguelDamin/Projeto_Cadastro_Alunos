@@ -20,31 +20,54 @@ if (!isset($_SESSION['usuario_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão Escolar</title>
-    <!-- Link para o CSS do Font Awesome (ícones) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <nav class="sidebar">
+<body class="sidebar-collapsed"> <nav class="sidebar">
+        <div class="sidebar-header"></div> 
+        
         <ul>
-            <!-- <li><a href="painel.php" title="Painel"><i class="fas fa-tachometer-alt"></i> <span>Painel</span></a></li> -->
-            <li><a href="cadastro_geral.php?reset=1" title="Cadastro de aluno"><i class="fas fa-user-plus"></i> <span>Cadastro de Aluno</span></a></li>
-            <li><a href="cadastro_professor.php" title="Cadastrar Professor"><i class="fas fa-user-tie"></i> <span>Cadastrar Professor</span></a></li>
-            <li><a href="cadastro_turma.php" title="Cadastrar Turma"><i class="fas fa-users"></i> <span>Cadastrar Turma</span></a></li>
-            <!-- Adicione outros links aqui -->
-            <!-- Adicione outros links aqui -->
-        </ul>
-        <ul class="logout-section">
-             <li><a href="logout.php" title="Sair"><i class="fas fa-sign-out-alt"></i> <span>Sair (<?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>)</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-toggle">
+                    <div><i class="fas fa-folder-plus"></i><span>Cadastros</span></div>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="cadastro_geral.php?reset=1"><i class="fas fa-user-plus"></i><span>Cadastrar Aluno</span></a></li>
+                    <li><a href="#"><i class="fas fa-chalkboard-teacher"></i><span>Cadastrar Professores</span></a></li>
+                    <li><a href="#"><i class="fas fa-school"></i><span>Cadastrar Turmas</span></a></li>
+                </ul>
+            </li>
+
+            <li class="has-submenu">
+                <a href="#" class="submenu-toggle">
+                    <div><i class="fas fa-chart-pie"></i><span>Relatórios</span></div>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-file-invoice"></i><span>Relatório de Alunos</span></a></li>
+                    <li><a href="#"><i class="fas fa-file-alt"></i><span>Relatório de Turmas</span></a></li>
+                </ul>
+            </li>
+
         </ul>
     </nav>
 
     <header>
         <a href="painel.php" class="logo-link">
-            <h1>Sistema Escolar</h1>
+            <div class="header-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <div>
+                    <h1>Sistema Escolar</h1>
+                    <p>GV Enterprise</p>
+                </div>
+            </div>
         </a>
-        <a href="logout.php" class="logout-button">Sair</a>
+        <a href="logout.php" class="logout-button">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
     </header>
 
-    <div class="container">
+    <div class="main-content">
+        <div class="content-wrapper">
