@@ -28,6 +28,7 @@ if ($step == 1) {
     $_SESSION['dados_responsavel'] = [
         'nome_completo_resp' => $_POST['nome_completo_resp'],
         'cpf_resp' => $_POST['cpf_resp'],
+        'grau_parentesco_resp' => $_POST['grau_parentesco_resp'],
         'email_resp' => $_POST['email_resp'],
         'telefone_resp' => $_POST['telefone_resp'],
         'cep_resp' => $cep_limpo,
@@ -50,7 +51,15 @@ if ($step == 1) {
     
     // Pega os dados do aluno do formulário
     $nome_aluno = $_POST['nome_completo_aluno'];
-    $data_nascimento_aluno = $_POST['data_nascimento_aluno'];
+    $data_nascimento_br = $_POST['data_nascimento_aluno'];
+    
+    // Converte a data do formato dd/mm/YYYY para YYYY-mm-dd para o banco de dados
+    try {
+        $data_nascimento_aluno = DateTime::createFromFormat('d/m/Y', $data_nascimento_br)->format('Y-m-d');
+    } catch (Exception $e) {
+        // Se a data for inválida, define como null ou lida com o erro
+        $data_nascimento_aluno = null; 
+    }
     $email_aluno = $_POST['email_aluno'] ?: null;
     $cpf_aluno = $_POST['cpf_aluno'] ?: null;
     $caminho_foto = null; // Inicia a variável da foto como nula
@@ -113,19 +122,25 @@ if ($step == 1) {
 
     $pdo->beginTransaction();
     try {
-        // 1. INSERE O RESPONSÁVEL (código que você já tem)
-        $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_resp = $pdo->prepare($sql_resp);
-        $stmt_resp->execute([
-            $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
-            $dados_responsavel['email_resp'], $dados_responsavel['telefone_resp'],
-            $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
-            $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
-            $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
-            $dados_responsavel['uf_resp']
-        ]);
-
-        $id_responsavel = $pdo->lastInsertId();
+        // 1. VERIFICA SE O RESPONSÁVEL JÁ EXISTE OU PRECISA SER INSERIDO
+        if (isset($dados_responsavel['id_resp']) && !empty($dados_responsavel['id_resp'])) {
+            // O responsável já existe, apenas usamos o ID dele
+            $id_responsavel = $dados_responsavel['id_resp'];
+        } else {
+            // O responsável é novo, então fazemos a inserção
+            $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, grau_parentesco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_resp = $pdo->prepare($sql_resp);
+            $stmt_resp->execute([
+                $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
+                $dados_responsavel['email_resp'], $dados_responsavel['telefone_resp'],
+                $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
+                $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
+                $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
+                $dados_responsavel['uf_resp'],
+                $dados_responsavel['grau_parentesco_resp']
+            ]);
+            $id_responsavel = $pdo->lastInsertId();
+        }
 
         // 2. INSERE O ALUNO (COM A CORREÇÃO)
         // Adicionamos a coluna `caminho_foto` e um `?` a mais
@@ -143,13 +158,16 @@ if ($step == 1) {
             $caminho_foto // A variável com o nome do arquivo da foto
         ]);
 
+        $id_aluno = $pdo->lastInsertId();
+
         $pdo->commit();
 
         unset($_SESSION['step']);
         unset($_SESSION['dados_responsavel']);
         unset($_SESSION['form_data_aluno']); // Limpa também os dados do formulário do aluno
 
-        header("Location: painel.php?sucesso=cadastro_completo");
+        // Redireciona para a nova página de sucesso, passando o ID do aluno
+        header("Location: cadastro_concluido.php?id=" . $id_aluno);
         exit;
 
     } catch (PDOException $e) {

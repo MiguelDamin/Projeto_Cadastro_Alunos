@@ -13,6 +13,45 @@ if (isset($_GET['reset'])) {
     exit;
 }
 
+// --- LÓGICA PARA REUTILIZAR RESPONSÁVEL ---
+// Se um ID de responsável for passado, pula para o passo 2 com os dados dele.
+if (isset($_GET['id_resp'])) {
+    $id_responsavel = (int)$_GET['id_resp'];
+    
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM responsaveis WHERE id = ?");
+        $stmt->execute([$id_responsavel]);
+        $responsavel = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($responsavel) {
+            // Limpa dados de aluno anteriores e define o passo
+            unset($_SESSION['form_data_aluno']);
+            $_SESSION['step'] = 2;
+
+            // Mapeia os dados do banco para o formato esperado na sessão
+            $_SESSION['dados_responsavel'] = [
+                'id_resp' => $responsavel['id'], // <-- ADICIONAMOS O ID AQUI!
+                'nome_completo_resp' => $responsavel['nome_completo'],
+                'cpf_resp' => $responsavel['cpf'],
+                'grau_parentesco_resp' => $responsavel['grau_parentesco'],
+                'email_resp' => $responsavel['email'],
+                'telefone_resp' => $responsavel['telefone'],
+                'cep_resp' => $responsavel['cep'],
+                'logradouro_resp' => $responsavel['logradouro'],
+                'numero_resp' => $responsavel['numero'],
+                'complemento_resp' => $responsavel['complemento'],
+                'bairro_resp' => $responsavel['bairro'],
+                'cidade_resp' => $responsavel['cidade'],
+                'uf_resp' => $responsavel['uf']
+            ];
+        }
+    } catch (PDOException $e) { /* Ignora o erro e continua para o passo 1 */ }
+
+    // Redireciona para a URL limpa para evitar reprocessamento no refresh.
+    header('Location: cadastro_geral.php');
+    exit;
+}
+
 // Permite voltar para um passo específico (usado no link "Alterar" do passo 2).
 if (isset($_GET['back_to_step'])) {
     $_SESSION['step'] = (int)$_GET['back_to_step'];
@@ -70,6 +109,19 @@ if ($form_error) {
             <div class="form-group">
                 <label for="telefone_resp">Telefone</label>
                 <input type="text" placeholder="(00) 90000-0000" name="telefone_resp" id="telefone_resp" value="<?php echo htmlspecialchars($dados_responsavel['telefone_resp'] ?? ''); ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="grau_parentesco_resp">Grau de Parentesco *</label>
+                <select name="grau_parentesco_resp" id="grau_parentesco_resp" required>
+                    <option value="">Selecione...</option>
+                    <option value="Pai" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Pai') ? 'selected' : ''; ?>>Pai</option>
+                    <option value="Mãe" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Mãe') ? 'selected' : ''; ?>>Mãe</option>
+                    <option value="Avô/Avó" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Avô/Avó') ? 'selected' : ''; ?>>Avô/Avó</option>
+                    <option value="Tio/Tia" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Tio/Tia') ? 'selected' : ''; ?>>Tio/Tia</option>
+                    <option value="Outro" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Outro') ? 'selected' : ''; ?>>Outro</option>
+                </select>
             </div>
         </div>
 
@@ -136,7 +188,7 @@ if ($form_error) {
             </div>
             <div class="form-group">
                 <label for="data_nascimento_aluno">Data de Nascimento *</label>
-                <input type="date" name="data_nascimento_aluno" id="data_nascimento_aluno" value="<?php echo htmlspecialchars($form_data_aluno['data_nascimento_aluno'] ?? ''); ?>" required>
+                <input type="text" placeholder="dd/mm/aaaa" name="data_nascimento_aluno" id="data_nascimento_aluno" value="<?php echo htmlspecialchars($form_data_aluno['data_nascimento_aluno'] ?? ''); ?>" required maxlength="10">
             </div>
         </div>
 
@@ -146,8 +198,8 @@ if ($form_error) {
                 <input type="email" placeholder="email.aluno@exemplo.com" name="email_aluno" id="email_aluno" value="<?php echo htmlspecialchars($form_data_aluno['email_aluno'] ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="cpf_aluno">CPF (opcional)</label>
-                <input type="text" placeholder="000.000.000-00" name="cpf_aluno" id="cpf_aluno" value="<?php echo htmlspecialchars($form_data_aluno['cpf_aluno'] ?? ''); ?>">
+                <label for="cpf_aluno">CPF *</label>
+                <input type="text" placeholder="000.000.000-00" name="cpf_aluno" id="cpf_aluno" value="<?php echo htmlspecialchars($form_data_aluno['cpf_aluno'] ?? ''); ?>" required>
             </div>
         </div>
 
@@ -370,6 +422,20 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     }
+
+    // --- MÁSCARA PARA DATA DE NASCIMENTO DO ALUNO (se estiver no passo 2) ---
+    const inputDataNascimento = document.querySelector('#data_nascimento_aluno');
+    if (inputDataNascimento) {
+        inputDataNascimento.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            
+            if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
+            if (value.length > 5) value = value.slice(0, 5) + '/' + value.slice(5, 9);
+            
+            e.target.value = value;
+        });
+    }
+
 });
 </script>
 
@@ -398,4 +464,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+<?php require 'templates/footer.php'; ?>
 <?php require 'templates/footer.php'; ?>
