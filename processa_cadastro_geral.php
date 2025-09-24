@@ -28,6 +28,7 @@ if ($step == 1) {
     $_SESSION['dados_responsavel'] = [
         'nome_completo_resp' => $_POST['nome_completo_resp'],
         'cpf_resp' => $_POST['cpf_resp'],
+        'grau_parentesco_resp' => $_POST['grau_parentesco_resp'],
         'email_resp' => $_POST['email_resp'],
         'telefone_resp' => $_POST['telefone_resp'],
         'cep_resp' => $cep_limpo,
@@ -114,7 +115,7 @@ if ($step == 1) {
     $pdo->beginTransaction();
     try {
         // 1. INSERE O RESPONSÁVEL (código que você já tem)
-        $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, grau_parentesco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_resp = $pdo->prepare($sql_resp);
         $stmt_resp->execute([
             $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
@@ -122,7 +123,8 @@ if ($step == 1) {
             $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
             $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
             $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
-            $dados_responsavel['uf_resp']
+            $dados_responsavel['uf_resp'],
+            $dados_responsavel['grau_parentesco_resp']
         ]);
 
         $id_responsavel = $pdo->lastInsertId();

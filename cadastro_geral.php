@@ -72,6 +72,19 @@ if ($form_error) {
                 <input type="text" placeholder="(00) 90000-0000" name="telefone_resp" id="telefone_resp" value="<?php echo htmlspecialchars($dados_responsavel['telefone_resp'] ?? ''); ?>">
             </div>
         </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="grau_parentesco_resp">Grau de Parentesco *</label>
+                <select name="grau_parentesco_resp" id="grau_parentesco_resp" required>
+                    <option value="">Selecione...</option>
+                    <option value="Pai" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Pai') ? 'selected' : ''; ?>>Pai</option>
+                    <option value="Mãe" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Mãe') ? 'selected' : ''; ?>>Mãe</option>
+                    <option value="Avô/Avó" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Avô/Avó') ? 'selected' : ''; ?>>Avô/Avó</option>
+                    <option value="Tio/Tia" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Tio/Tia') ? 'selected' : ''; ?>>Tio/Tia</option>
+                    <option value="Outro" <?php echo (($dados_responsavel['grau_parentesco_resp'] ?? '') === 'Outro') ? 'selected' : ''; ?>>Outro</option>
+                </select>
+            </div>
+        </div>
 
         <h4>Endereço</h4>
         <div class="form-row">
