@@ -51,7 +51,15 @@ if ($step == 1) {
     
     // Pega os dados do aluno do formulário
     $nome_aluno = $_POST['nome_completo_aluno'];
-    $data_nascimento_aluno = $_POST['data_nascimento_aluno'];
+    $data_nascimento_br = $_POST['data_nascimento_aluno'];
+    
+    // Converte a data do formato dd/mm/YYYY para YYYY-mm-dd para o banco de dados
+    try {
+        $data_nascimento_aluno = DateTime::createFromFormat('d/m/Y', $data_nascimento_br)->format('Y-m-d');
+    } catch (Exception $e) {
+        // Se a data for inválida, define como null ou lida com o erro
+        $data_nascimento_aluno = null; 
+    }
     $email_aluno = $_POST['email_aluno'] ?: null;
     $cpf_aluno = $_POST['cpf_aluno'] ?: null;
     $caminho_foto = null; // Inicia a variável da foto como nula

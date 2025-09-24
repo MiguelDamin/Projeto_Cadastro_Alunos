@@ -149,7 +149,7 @@ if ($form_error) {
             </div>
             <div class="form-group">
                 <label for="data_nascimento_aluno">Data de Nascimento *</label>
-                <input type="date" name="data_nascimento_aluno" id="data_nascimento_aluno" value="<?php echo htmlspecialchars($form_data_aluno['data_nascimento_aluno'] ?? ''); ?>" required>
+                <input type="text" placeholder="dd/mm/aaaa" name="data_nascimento_aluno" id="data_nascimento_aluno" value="<?php echo htmlspecialchars($form_data_aluno['data_nascimento_aluno'] ?? ''); ?>" required maxlength="10">
             </div>
         </div>
 
@@ -383,6 +383,20 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     }
+
+    // --- MÁSCARA PARA DATA DE NASCIMENTO DO ALUNO (se estiver no passo 2) ---
+    const inputDataNascimento = document.querySelector('#data_nascimento_aluno');
+    if (inputDataNascimento) {
+        inputDataNascimento.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            
+            if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
+            if (value.length > 5) value = value.slice(0, 5) + '/' + value.slice(5, 9);
+            
+            e.target.value = value;
+        });
+    }
+
 });
 </script>
 
