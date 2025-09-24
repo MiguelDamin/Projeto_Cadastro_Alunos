@@ -668,3 +668,72 @@ body.auth-page {
         border-radius: 5px;
         font-size: 1rem;
 }
+
+/* Container para os botões de ação */
+.botoes-acao {
+    display: flex; /* Ativa o layout flexbox para alinhar os itens horizontalmente */
+    justify-content: center; /* Centraliza os botões no container */
+    align-items: center; /* Alinha os botões verticalmente (útil se tiverem alturas diferentes) */
+    gap: 16px; /* Adiciona um espaço de 16px entre os botões */
+    margin-top: 30px; /* Adiciona uma margem superior para separar do conteúdo acima */
+}
+
+/* Estilos base para AMBOS os botões */
+.botoes-acao a {
+    text-decoration: none; /* Remove o sublinhado padrão dos links */
+    padding: 12px 24px; /* Define o preenchimento interno (12px na vertical, 24px na horizontal) */
+    border-radius: 8px; /* Arredonda os cantos dos botões */
+    font-weight: 500; /* Define o peso da fonte como semi-bold */
+    font-size: 16px; /* Define o tamanho da fonte */
+    display: inline-flex; /* Permite que o ícone e o texto fiquem alinhados corretamente */
+    align-items: center; /* Centraliza o ícone e o texto verticalmente */
+    gap: 8px; /* Adiciona um espaço de 8px entre o ícone e o texto */
+    transition: all 0.3s ease; /* Adiciona uma transição suave para todas as propriedades */
+    border: 1px solid transparent; /* Adiciona uma borda transparente para evitar "pulos" no hover */
+}
+
+/* Estilo específico para o botão PRIMÁRIO (Novo Cadastro) */
+.btn-primary {
+    background-color: #007bff; /* Cor de fundo azul (padrão Bootstrap, similar ao da imagem) */
+    color: #ffffff; /* Cor do texto branca */
+}
+
+/* Efeito de hover para o botão PRIMÁRIO */
+.btn-primary:hover {
+    background-color: #0056b3; /* Um tom de azul mais escuro para o hover */
+    transform: translateY(-2px); /* Efeito de leve flutuação ao passar o mouse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra sutil */
+}
+
+/* Estilo específico para o botão SECUNDÁRIO (Voltar ao Painel) */
+.btn-secondary {
+    background-color: transparent; /* Fundo transparente */
+    color: #6c757d; /* Cor do texto cinza/roxa, similar à da imagem */
+    border-color: #dee2e6; /* Cor da borda sutil */
+}
+
+/* Efeito de hover para o botão SECUNDÁRIO */
+.btn-secondary:hover {
+    background-color: #f8f9fa; /* Cor de fundo muito clara para o hover */
+    color: #343a40; /* Cor do texto mais escura */
+    border-color: #ced4da; /* Cor da borda um pouco mais escura */
+}
+
+/* Estilo para o botão PRIMÁRIO OUTLINE (contorno) */
+.btn-primary-outline {
+    background-color: transparent;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+/* Efeito de hover para o botão PRIMÁRIO OUTLINE */
+.btn-primary-outline:hover {
+    background-color: #007bff;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+}
+/* Ajuste fino para os ícones dentro dos botões */
+.botoes-acao a i {
+    font-size: 1em; /* Garante que o ícone tenha o mesmo tamanho da fonte */
+}

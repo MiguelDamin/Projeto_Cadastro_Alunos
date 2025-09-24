@@ -122,20 +122,25 @@ if ($step == 1) {
 
     $pdo->beginTransaction();
     try {
-        // 1. INSERE O RESPONSÁVEL (código que você já tem)
-        $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, grau_parentesco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_resp = $pdo->prepare($sql_resp);
-        $stmt_resp->execute([
-            $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
-            $dados_responsavel['email_resp'], $dados_responsavel['telefone_resp'],
-            $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
-            $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
-            $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
-            $dados_responsavel['uf_resp'],
-            $dados_responsavel['grau_parentesco_resp']
-        ]);
-
-        $id_responsavel = $pdo->lastInsertId();
+        // 1. VERIFICA SE O RESPONSÁVEL JÁ EXISTE OU PRECISA SER INSERIDO
+        if (isset($dados_responsavel['id_resp']) && !empty($dados_responsavel['id_resp'])) {
+            // O responsável já existe, apenas usamos o ID dele
+            $id_responsavel = $dados_responsavel['id_resp'];
+        } else {
+            // O responsável é novo, então fazemos a inserção
+            $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, grau_parentesco) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_resp = $pdo->prepare($sql_resp);
+            $stmt_resp->execute([
+                $dados_responsavel['nome_completo_resp'], $dados_responsavel['cpf_resp'],
+                $dados_responsavel['email_resp'], $dados_responsavel['telefone_resp'],
+                $dados_responsavel['cep_resp'], $dados_responsavel['logradouro_resp'],
+                $dados_responsavel['numero_resp'], $dados_responsavel['complemento_resp'],
+                $dados_responsavel['bairro_resp'], $dados_responsavel['cidade_resp'],
+                $dados_responsavel['uf_resp'],
+                $dados_responsavel['grau_parentesco_resp']
+            ]);
+            $id_responsavel = $pdo->lastInsertId();
+        }
 
         // 2. INSERE O ALUNO (COM A CORREÇÃO)
         // Adicionamos a coluna `caminho_foto` e um `?` a mais
@@ -153,13 +158,16 @@ if ($step == 1) {
             $caminho_foto // A variável com o nome do arquivo da foto
         ]);
 
+        $id_aluno = $pdo->lastInsertId();
+
         $pdo->commit();
 
         unset($_SESSION['step']);
         unset($_SESSION['dados_responsavel']);
         unset($_SESSION['form_data_aluno']); // Limpa também os dados do formulário do aluno
 
-        header("Location: painel.php?sucesso=cadastro_completo");
+        // Redireciona para a nova página de sucesso, passando o ID do aluno
+        header("Location: cadastro_concluido.php?id=" . $id_aluno);
         exit;
 
     } catch (PDOException $e) {

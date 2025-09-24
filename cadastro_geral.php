@@ -13,6 +13,45 @@ if (isset($_GET['reset'])) {
     exit;
 }
 
+// --- LÓGICA PARA REUTILIZAR RESPONSÁVEL ---
+// Se um ID de responsável for passado, pula para o passo 2 com os dados dele.
+if (isset($_GET['id_resp'])) {
+    $id_responsavel = (int)$_GET['id_resp'];
+    
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM responsaveis WHERE id = ?");
+        $stmt->execute([$id_responsavel]);
+        $responsavel = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($responsavel) {
+            // Limpa dados de aluno anteriores e define o passo
+            unset($_SESSION['form_data_aluno']);
+            $_SESSION['step'] = 2;
+
+            // Mapeia os dados do banco para o formato esperado na sessão
+            $_SESSION['dados_responsavel'] = [
+                'id_resp' => $responsavel['id'], // <-- ADICIONAMOS O ID AQUI!
+                'nome_completo_resp' => $responsavel['nome_completo'],
+                'cpf_resp' => $responsavel['cpf'],
+                'grau_parentesco_resp' => $responsavel['grau_parentesco'],
+                'email_resp' => $responsavel['email'],
+                'telefone_resp' => $responsavel['telefone'],
+                'cep_resp' => $responsavel['cep'],
+                'logradouro_resp' => $responsavel['logradouro'],
+                'numero_resp' => $responsavel['numero'],
+                'complemento_resp' => $responsavel['complemento'],
+                'bairro_resp' => $responsavel['bairro'],
+                'cidade_resp' => $responsavel['cidade'],
+                'uf_resp' => $responsavel['uf']
+            ];
+        }
+    } catch (PDOException $e) { /* Ignora o erro e continua para o passo 1 */ }
+
+    // Redireciona para a URL limpa para evitar reprocessamento no refresh.
+    header('Location: cadastro_geral.php');
+    exit;
+}
+
 // Permite voltar para um passo específico (usado no link "Alterar" do passo 2).
 if (isset($_GET['back_to_step'])) {
     $_SESSION['step'] = (int)$_GET['back_to_step'];
@@ -425,4 +464,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+<?php require 'templates/footer.php'; ?>
 <?php require 'templates/footer.php'; ?>
