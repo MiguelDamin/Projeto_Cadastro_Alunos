@@ -198,8 +198,8 @@ if ($form_error) {
                 <input type="email" placeholder="email.aluno@exemplo.com" name="email_aluno" id="email_aluno" value="<?php echo htmlspecialchars($form_data_aluno['email_aluno'] ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="cpf_aluno">CPF (opcional)</label>
-                <input type="text" placeholder="000.000.000-00" name="cpf_aluno" id="cpf_aluno" value="<?php echo htmlspecialchars($form_data_aluno['cpf_aluno'] ?? ''); ?>">
+                <label for="cpf_aluno">CPF *</label>
+                <input type="text" placeholder="000.000.000-00" name="cpf_aluno" id="cpf_aluno" value="<?php echo htmlspecialchars($form_data_aluno['cpf_aluno'] ?? ''); ?>" required>
             </div>
         </div>
 
