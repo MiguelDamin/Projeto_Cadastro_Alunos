@@ -86,9 +86,8 @@ if ($form_error) {
 <div class="form-card">
     <form action="processa_cadastro_geral.php" method="POST">
         <input type="hidden" name="step" value="1">
-        
-        <h3>Dados do Responsável</h3>
-        <p>Preencha as informações do responsável pelo aluno que será cadastrado.</p>
+        <fieldset>
+       <legend>1. Informações Responsável</legend>
         
         <h4>Dados Pessoais</h4>
         <div class="form-row">
@@ -166,6 +165,7 @@ if ($form_error) {
         </div>
     </form>
 </div>
+</fieldset>
 <?php endif; ?>
 
 <?php if ($step == 2): // PASSO 2: FORMULÁRIO DO ALUNO ?>
@@ -178,7 +178,8 @@ if ($form_error) {
     <form action="processa_cadastro_geral.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="step" value="2">
         
-        <h3>Dados do Aluno</h3>
+        <fieldset>
+        <legend>2. Dados do Aluno</legend>
         <p>Agora, preencha as informações do aluno.</p>
 
         <div class="form-row">
@@ -221,6 +222,7 @@ if ($form_error) {
         </div>
     </form>
 </div>
+</fieldset>
 <?php endif; ?>
 
 <script>
@@ -466,3 +468,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <?php require 'templates/footer.php'; ?>
 <?php require 'templates/footer.php'; ?>
+
+<style>
+    fieldset { border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+    legend { font-weight: bold; font-size: 1.2em; color: #007bff; }
+</style>
