@@ -1,151 +1,252 @@
-<?php 
-require 'templates/header.php'; 
-require 'conexao.php';
+<?php
+session_start();
+require_once 'templates/header.php';
+require_once 'conexao.php';
 
-// Processar cadastro de nova turma
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_turma'])) {
-    $nome_turma = $_POST['nome_turma'];
-    $ano_letivo = $_POST['ano_letivo'];
-    $periodo = $_POST['periodo'];
-    
-    try {
-        // Usando apenas os campos que existem na sua tabela
-        $sql = "INSERT INTO turmas (nome_turma, ano_letivo, periodo) VALUES (?, ?, ?)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nome_turma, $ano_letivo, $periodo]);
-        
-        $sucesso = "Turma cadastrada com sucesso!";
-    } catch (PDOException $e) {
-        $erro = "Erro ao cadastrar: " . $e->getMessage();
-    }
+// --- LÓGICA DE CONTROLE DO WIZARD ---
+if (isset($_GET['reset'])) {
+    unset($_SESSION['cadastro_turma_dados']);
+    header('Location: cadastro_turma.php');
+    exit;
 }
+// Permite voltar para um passo específico
+if (isset($_GET['step'])) {
+    $_SESSION['cadastro_turma_dados']['step'] = (int)$_GET['step'];
+}
+$step = $_SESSION['cadastro_turma_dados']['step'] ?? 1;
 
-// Buscar turmas existentes - adaptado para sua estrutura
+// Pega dados da sessão para repopular o formulário
+$dados_turma = $_SESSION['cadastro_turma_dados'] ?? [];
+
+// --- BUSCAR DADOS DO BANCO PARA OS DROPDOWNS ---
 try {
-    // Primeiro vamos tentar buscar só da tabela turmas
-    $turmas = $pdo->query("SELECT * FROM turmas ORDER BY ano_letivo DESC, nome_turma ASC")->fetchAll();
+    // Vamos verificar cada query, uma por uma.
+    $niveis_ensino = $pdo->query("SELECT id, nome FROM niveis_ensino ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $series = $pdo->query("SELECT id, nome FROM series ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $salas = $pdo->query("SELECT id, nome_sala FROM salas ORDER BY nome_sala ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $disciplinas = $pdo->query("SELECT id, nome_disciplina FROM disciplinas ORDER BY nome_disciplina ASC")->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
-    $turmas = [];
-    $erro = "Erro ao carregar turmas: " . $e->getMessage();
+    // MUDANÇA IMPORTANTE AQUI:
+    // Em vez de falhar silenciosamente, vamos parar o script e mostrar o erro exato.
+    die("<h1>Erro ao Carregar Dados do Banco</h1><p>Ocorreu um erro ao tentar buscar as informações necessárias para o formulário. Verifique se todas as tabelas (niveis_ensino, series, salas, disciplinas) e suas colunas existem no banco de dados.</p><p><strong>Mensagem do Erro:</strong> " . $e->getMessage() . "</p>");
 }
 ?>
 
-<h2>Cadastrar Turma</h2>
+<div class="form-card">
+    <h2 class="form-title">Cadastro de Nova Turma</h2>
+    <p class="step-indicator">Etapa <?php echo $step; ?> de 5</p>
 
-<?php if (isset($sucesso)): ?>
-    <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-        ✅ <?php echo $sucesso; ?>
-    </div>
-<?php endif; ?>
+    <?php if ($step == 1): ?>
+        <form action="processa_cadastro_turma.php" method="POST">
+            <input type="hidden" name="step" value="1">
+            <fieldset>
+                <legend>1. Identificação da Turma</legend>
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="nome_turma">Nome da Turma *</label>
+                        <input type="text" name="nome_turma" id="nome_turma" required data-codigo="nome" value="<?php echo htmlspecialchars($dados_turma['nome_turma'] ?? ''); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="ano_letivo">Ano Letivo *</label>
+                        <input type="number" name="ano_letivo" id="ano_letivo" value="<?php echo htmlspecialchars($dados_turma['ano_letivo'] ?? date('Y')); ?>" required data-codigo="ano">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="codigo_turma">Código da Turma (sugestão)</label>
+                        <input type="text" name="codigo_turma" id="codigo_turma" readonly value="<?php echo htmlspecialchars($dados_turma['codigo_turma'] ?? ''); ?>">
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions"><button type="submit" class="btn-primary">Próximo</button></div>
+        </form>
+    <?php endif; ?>
 
-<?php if (isset($erro)): ?>
-    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-        ❌ <?php echo $erro; ?>
-    </div>
-<?php endif; ?>
-
-<!-- Formulário -->
-<form method="POST" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-    <h3>Nova Turma</h3>
-    
-    <div class="form-row">
-        <div class="form-group">
-            <label for="nome_turma">Nome da Turma:</label>
-            <select name="nome_turma" id="nome_turma" required>
-                <option value="">Selecione...</option>
-                <option value="1° Ano A">1° Ano A</option>
-                <option value="1° Ano B">1° Ano B</option>
-                <option value="1° Ano C">1° Ano C</option>
-                <option value="2° Ano A">2° Ano A</option>
-                <option value="2° Ano B">2° Ano B</option>
-                <option value="2° Ano C">2° Ano C</option>
-                <option value="3° Ano A">3° Ano A</option>
-                <option value="3° Ano B">3° Ano B</option>
-                <option value="3° Ano C">3° Ano C</option>
-            </select>
+    <?php if ($step == 2): ?>
+        <div class="summary-box">
+            <strong>Resumo Etapa 1:</strong> Turma "<?php echo htmlspecialchars($dados_turma['nome_turma']); ?>" / <?php echo htmlspecialchars($dados_turma['ano_letivo']); ?>.
+            <a href="cadastro_turma.php?step=1">(Alterar)</a>
         </div>
-        <div class="form-group">
-            <label for="ano_letivo">Ano Letivo:</label>
-            <select name="ano_letivo" id="ano_letivo" required>
-                <option value="">Selecione...</option>
-                <option value="2024">2024</option>
-                <option value="2025" selected>2025</option>
-                <option value="2026">2026</option>
-            </select>
+        <form action="processa_cadastro_turma.php" method="POST">
+            <input type="hidden" name="step" value="2">
+            <fieldset>
+                <legend>2. Estrutura da Turma</legend>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_nivel_ensino">Nível de Ensino *</label>
+                        <select name="id_nivel_ensino" id="id_nivel_ensino" required>
+                            <option value="">Selecione...</option>
+                            <?php foreach ($niveis_ensino as $nivel): ?>
+                                <option value="<?php echo $nivel['id']; ?>" <?php echo (($dados_turma['id_nivel_ensino'] ?? '') == $nivel['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($nivel['nome']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_serie">Série / Ano *</label>
+                        <select name="id_serie" id="id_serie" required>
+                             <option value="">Selecione...</option>
+                            <?php foreach ($series as $serie): ?>
+                                <option value="<?php echo $serie['id']; ?>" <?php echo (($dados_turma['id_serie'] ?? '') == $serie['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($serie['nome']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="turno">Turno *</label>
+                        <select name="turno" id="turno" required>
+                            <option value="">Selecione...</option>
+                            <?php $turno_selecionado = $dados_turma['turno'] ?? ''; ?>
+                            <option value="Manhã" <?php echo ($turno_selecionado == 'Manhã') ? 'selected' : ''; ?>>Manhã</option>
+                            <option value="Tarde" <?php echo ($turno_selecionado == 'Tarde') ? 'selected' : ''; ?>>Tarde</option>
+                            <option value="Noite" <?php echo ($turno_selecionado == 'Noite') ? 'selected' : ''; ?>>Noite</option>
+                            <option value="Integral" <?php echo ($turno_selecionado == 'Integral') ? 'selected' : ''; ?>>Integral</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="numero_maximo_alunos">Nº Máximo de Alunos</label>
+                        <input type="number" name="numero_maximo_alunos" id="numero_maximo_alunos" min="1" value="<?php echo htmlspecialchars($dados_turma['max_alunos'] ?? '30'); ?>">
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions"><button type="submit" class="btn-primary">Próximo</button></div>
+        </form>
+    <?php endif; ?>
+
+    <?php if ($step == 3): ?>
+        <div class="summary-box">
+            <strong>Resumo Etapa 2:</strong> Nível: <?php echo htmlspecialchars($dados_turma['nivel_ensino'] ?? 'N/D'); ?>, Turno: <?php echo htmlspecialchars($dados_turma['turno'] ?? 'N/D'); ?>.
+            <a href="cadastro_turma.php?step=2">(Alterar)</a>
         </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group">
-            <label for="periodo">Período:</label>
-            <select name="periodo" id="periodo" required>
-                <option value="">Selecione...</option>
-                <option value="Matutino">Matutino</option>
-                <option value="Vespertino">Vespertino</option>
-                <option value="Noturno">Noturno</option>
-                <option value="Integral">Integral</option>
-            </select>
+        <form action="processa_cadastro_turma.php" method="POST">
+            <input type="hidden" name="step" value="3">
+            <fieldset>
+                <legend>3. Localização e Horários</legend>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_sala">Sala de Aula Principal *</label>
+                        <select name="id_sala" id="id_sala" required>
+                            <option value="">Selecione a sala principal...</option>
+                             <?php foreach ($salas as $sala): ?>
+                                <option value="<?php echo $sala['id']; ?>" <?php echo (($dados_turma['id_sala'] ?? '') == $sala['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($sala['nome_sala']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Grade de Horários</label>
+                    <p><small>A grade de horários detalhada (disciplinas, professores e horários) poderá ser configurada após a criação da turma, na tela de "Editar Turma".</small></p>
+                    <button type="button" class="btn-secondary" disabled>Configurar Grade de Horários</button>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Próximo</button>
+            </div>
+        </form>
+    <?php endif; ?>
+    <?php if ($step == 4): ?>
+        <div class="summary-box">
+            <strong>Resumo Etapa 3:</strong> Sala Principal Definida.
+            <a href="cadastro_turma.php?step=3">(Alterar)</a>
         </div>
+        <form action="processa_cadastro_turma.php" method="POST">
+            <input type="hidden" name="step" value="4">
+            <fieldset>
+                <legend>4. Disciplinas da Turma</legend>
+                <p><small>Selecione todas as disciplinas que serão lecionadas para esta turma. Use Ctrl+Click (ou Cmd+Click em Mac) para selecionar várias.</small></p>
+                <div class="form-group">
+                    <label for="disciplinas">Disciplinas *</label>
+                    <select name="disciplinas[]" id="disciplinas" multiple size="10" required>
+                        <?php 
+                        $disciplinas_selecionadas = $dados_turma['ids_disciplinas'] ?? [];
+                        foreach ($disciplinas as $disciplina): 
+                            $selecionado = in_array($disciplina['id'], $disciplinas_selecionadas) ? 'selected' : '';
+                        ?>
+                            <option value="<?php echo $disciplina['id']; ?>" <?php echo $selecionado; ?>>
+                                <?php echo htmlspecialchars($disciplina['nome_disciplina']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Próximo</button>
+            </div>
+        </form>
+    <?php endif; ?>
+
     </div>
+</div>
 
-    <button type="submit" name="cadastrar_turma">Cadastrar Turma</button>
-</form>
+<script>
 
-<!-- Lista de Turmas -->
-<h3>Turmas Cadastradas</h3>
+document.addEventListener('DOMContentLoaded', function() {
 
-<?php if (empty($turmas)): ?>
-    <p style="text-align: center; color: #666; padding: 20px;">
-        Nenhuma turma cadastrada ainda.
-    </p>
-<?php else: ?>
-    <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-        <thead>
-            <tr style="background: #007bff; color: white;">
-                <th style="padding: 12px; border: 1px solid #ddd;">ID</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Nome da Turma</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Ano Letivo</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Período</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($turmas as $turma): ?>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo $turma['id']; ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">
-                        <?php echo htmlspecialchars($turma['nome_turma']); ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo htmlspecialchars($turma['ano_letivo']); ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo htmlspecialchars($turma['periodo']); ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-<?php endif; ?>
+    const anoInput = document.querySelector('[data-codigo="ano"]');
 
-<style>
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
+    const nomeInput = document.querySelector('[data-codigo="nome"]');
 
-table tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+    const codigoOutput = document.getElementById('codigo_turma');
 
-table tr:hover {
-    background-color: #e9ecef;
-}
-</style>
+
+
+    function gerarCodigoSugerido() {
+
+        if (!anoInput || !nomeInput || !codigoOutput) return;
+
+
+
+        const ano = anoInput.value.trim();
+
+        const nome = nomeInput.value.trim();
+
+        
+
+        if (!ano || !nome) {
+
+            codigoOutput.value = '';
+
+            return;
+
+        }
+
+
+
+        // Lógica para criar uma sigla a partir do nome
+
+        const nomeSigla = nome.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').toUpperCase();
+
+        
+
+        // Monta o código final
+
+        codigoOutput.value = `${ano}-${nomeSigla}`;
+
+    }
+
+
+
+    // Adiciona um "ouvinte" a cada campo relevante
+
+    anoInput.addEventListener('input', gerarCodigoSugerido);
+
+    nomeInput.addEventListener('input', gerarCodigoSugerido);
+
+
+
+    // Gera o código uma vez no carregamento da página
+
+    gerarCodigoSugerido();
+
+});
+
+</script>
 
 <?php require 'templates/footer.php'; ?>
