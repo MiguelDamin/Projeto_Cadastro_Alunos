@@ -43,7 +43,7 @@ try {
             </div>
             <div class="form-group">
                 <label for="rg">RG</label>
-                <input type="text" id="rg" name="rg" maxlength="20">
+                <input type="text" id="rg" name="rg" placeholder="000.000.000.0" maxlength="13">
             </div>
         </div>
         <div class="form-row">
@@ -70,7 +70,7 @@ try {
         <div class="form-row">
             <div class="form-group">
                 <label for="cep">CEP</label>
-                <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9">
+                <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" required>
             </div>
              <div class="form-group">
                 <label for="logradouro">Logradouro (Rua, Av.)</label>
@@ -116,15 +116,15 @@ try {
         <legend>3. Informações Profissionais e Acadêmicas</legend>
         <div class="form-row">
             <div class="form-group">
-                <label for="numero_matricula">Número de Matrícula *</label>
-                <input type="text" id="numero_matricula" name="numero_matricula" required>
+                <label for="numero_matricula">Nivel de Escolaridade</label>
+                <input type="text" id="nivel_escolaridade" name="nivel_escolaridade" required>
             </div>
             <div class="form-group">
-                <label for="data_admissao">Data de Admissão *</label>
+                <label for="data_admissao">Data de Admissão </label>
                 <input type="date" id="data_admissao" name="data_admissao" required>
             </div>
             <div class="form-group">
-                <label for="id_disciplina">Disciplina Principal *</label>
+                <label for="id_disciplina">Disciplina Principal</label>
                 <select name="id_disciplina" id="id_disciplina" required>
                     <option value="">Selecione uma disciplina...</option>
                     <?php foreach ($result_disciplinas as $disciplina): ?>
