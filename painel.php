@@ -44,6 +44,7 @@ require 'templates/header.php';
         </div>
     </div>
 
+
     <div class="widget card">
         <div class="widget-icon" style="background-color: #fce4ec;">
             <i class="fas fa-bolt" style="color: #e91e63;"></i>
