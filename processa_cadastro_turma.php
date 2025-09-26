@@ -1,4 +1,34 @@
 <?php
+session_start();
+require_once 'conexao.php';
+
+// --- Lógica para Requisições AJAX ---
+// AJAX envia dados como JSON, então precisamos ler o "corpo" da requisição
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (isset($input['action']) && $input['action'] === 'salvar_horario') {
+    // Inicializa o array de horários na sessão se não existir
+    if (!isset($_SESSION['cadastro_turma_dados']['horarios'])) {
+        $_SESSION['cadastro_turma_dados']['horarios'] = [];
+    }
+    // Adiciona o novo horário à sessão
+    $_SESSION['cadastro_turma_dados']['horarios'][] = [
+        'dia_semana' => $input['dia_semana'],
+        'hora_inicio' => $input['hora_inicio'],
+        'id_disciplina' => $input['id_disciplina'],
+        'id_professor' => $input['id_professor']
+    ];
+    
+    // Retorna uma resposta JSON para o JavaScript
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Horário adicionado à sessão.']);
+    exit; // Termina o script aqui para requisições AJAX
+}
+
+// --- Lógica para Formulários Normais (POST) ---
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['step'])) {
+    // ... (resto do seu código, sem alterações)
+}
 // Inicia a sessão para podermos armazenar os dados entre os passos.
 session_start();
 
@@ -72,12 +102,16 @@ switch ($step) {
         $_SESSION['cadastro_turma_dados']['step'] = 4;
         break;
 
-    case 4: // Recebendo dados da Tela 4: Associações de Disciplinas
-        if (empty($_POST['disciplinas']) || !is_array($_POST['disciplinas'])) {
-            die("Erro: Você deve selecionar pelo menos uma disciplina para a turma.");
+    case 4:
+        // Valida e salva os dados da Tela 4 na sessão
+        if (empty($_POST['alunos']) || !is_array($_POST['alunos'])) {
+            die("Erro: Você deve selecionar pelo menos um aluno para a turma.");
         }
-        $_SESSION['cadastro_turma_dados']['ids_disciplinas'] = array_map('intval', $_POST['disciplinas']);
-        $_SESSION['cadastro_turma_dados']['step'] = 5;
+        // Sanitiza o array para garantir que todos os IDs são números inteiros
+        $ids_alunos = array_map('intval', $_POST['alunos']);
+
+        $_SESSION['cadastro_turma_dados']['alunos_matriculados'] = $ids_alunos;
+        $_SESSION['cadastro_turma_dados']['step'] = 5; // Prepara para a tela final
         break;
 
     case 5: // Recebendo dados da Tela 5 e FINALIZANDO o cadastro
@@ -134,7 +168,7 @@ switch ($step) {
             // Exibe uma mensagem de erro clara. Em produção, isso seria registrado em um log.
             die("Erro ao salvar a turma: " . $e->getMessage());
         }
-        break;
+        
 }
 
 // Ao final dos passos 1 a 4, redireciona de volta para o formulário.

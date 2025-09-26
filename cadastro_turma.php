@@ -25,6 +25,8 @@ try {
     $series = $pdo->query("SELECT id, nome FROM series ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
     $salas = $pdo->query("SELECT id, nome_sala FROM salas ORDER BY nome_sala ASC")->fetchAll(PDO::FETCH_ASSOC);
     $disciplinas = $pdo->query("SELECT id, nome_disciplina FROM disciplinas ORDER BY nome_disciplina ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $alunos_disponiveis = $pdo->query("SELECT id, nome_completo FROM alunos ORDER BY nome_completo ASC")->fetchAll(PDO::FETCH_ASSOC);
+
 
 } catch (PDOException $e) {
     // MUDANÇA IMPORTANTE AQUI:
@@ -119,38 +121,37 @@ try {
     <?php endif; ?>
 
     <?php if ($step == 3): ?>
-        <div class="summary-box">
-            <strong>Resumo Etapa 2:</strong> Nível: <?php echo htmlspecialchars($dados_turma['nivel_ensino'] ?? 'N/D'); ?>, Turno: <?php echo htmlspecialchars($dados_turma['turno'] ?? 'N/D'); ?>.
-            <a href="cadastro_turma.php?step=2">(Alterar)</a>
-        </div>
-        <form action="processa_cadastro_turma.php" method="POST">
-            <input type="hidden" name="step" value="3">
-            <fieldset>
-                <legend>3. Localização e Horários</legend>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="id_sala">Sala de Aula Principal *</label>
-                        <select name="id_sala" id="id_sala" required>
-                            <option value="">Selecione a sala principal...</option>
-                             <?php foreach ($salas as $sala): ?>
-                                <option value="<?php echo $sala['id']; ?>" <?php echo (($dados_turma['id_sala'] ?? '') == $sala['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($sala['nome_sala']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Grade de Horários</label>
-                    <p><small>A grade de horários detalhada (disciplinas, professores e horários) poderá ser configurada após a criação da turma, na tela de "Editar Turma".</small></p>
-                    <button type="button" class="btn-secondary" disabled>Configurar Grade de Horários</button>
-                </div>
-            </fieldset>
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">Próximo</button>
+    <form action="processa_cadastro_turma.php" method="POST">
+        <input type="hidden" name="step" value="3">
+        <fieldset>
+            <legend>3. Localização e Horários</legend>
+            <div class="form-group">
+                <label for="id_sala">Sala de Aula Principal *</label>
+                <select name="id_sala" id="id_sala" required>
+                    <option value="">Selecione a sala...</option>
+                    <?php foreach ($salas as $sala): ?>
+                        <option value="<?php echo $sala['id']; ?>" <?php
+                        // Defina 'selected' se esta era a sala previamente selecionada.
+                        if (isset($dados_turma['id_sala']) && $dados_turma['id_sala'] == $sala['id']) {
+                            echo 'selected';
+                        }
+                        ?>>
+                            <?php echo htmlspecialchars($sala['nome_sala']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-        </form>
-    <?php endif; ?>
+
+            <div class="form-group">
+                <label>Grade de Horários</label>
+                <button type="button" id="btn-abrir-grade" class="btn-secondary">Configurar Grade de Horários</button>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Próximo</button>
+        </div>
+    </form>
+<?php endif; ?>
     <?php if ($step == 4): ?>
         <div class="summary-box">
             <strong>Resumo Etapa 3:</strong> Sala Principal Definida.
@@ -159,18 +160,18 @@ try {
         <form action="processa_cadastro_turma.php" method="POST">
             <input type="hidden" name="step" value="4">
             <fieldset>
-                <legend>4. Disciplinas da Turma</legend>
-                <p><small>Selecione todas as disciplinas que serão lecionadas para esta turma. Use Ctrl+Click (ou Cmd+Click em Mac) para selecionar várias.</small></p>
+                <legend>4. Matricular Alunos na Turma</legend>
+                <p><small>Comece a digitar o nome de um aluno para buscar e selecionar. Você pode selecionar múltiplos alunos.</small></p>
                 <div class="form-group">
-                    <label for="disciplinas">Disciplinas *</label>
-                    <select name="disciplinas[]" id="disciplinas" multiple size="10" required>
+                    <label for="alunos-select">Alunos *</label>
+                    <select name="alunos[]" id="alunos-select" multiple="multiple" class="select2-aluno" required>
                         <?php 
-                        $disciplinas_selecionadas = $dados_turma['ids_disciplinas'] ?? [];
-                        foreach ($disciplinas as $disciplina): 
-                            $selecionado = in_array($disciplina['id'], $disciplinas_selecionadas) ? 'selected' : '';
+                        $alunos_selecionados = $dados_turma['alunos_matriculados'] ?? [];
+                        foreach ($alunos_disponiveis as $aluno): 
+                            $selecionado = in_array($aluno['id'], $alunos_selecionados) ? 'selected' : '';
                         ?>
-                            <option value="<?php echo $disciplina['id']; ?>" <?php echo $selecionado; ?>>
-                                <?php echo htmlspecialchars($disciplina['nome_disciplina']); ?>
+                            <option value="<?php echo $aluno['id']; ?>" <?php echo $selecionado; ?>>
+                                <?php echo htmlspecialchars($aluno['nome_completo']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -181,6 +182,16 @@ try {
             </div>
         </form>
     <?php endif; ?>
+
+    </div>
+
+<script>
+$(document).ready(function() {
+    $('#alunos-select').select2({
+        placeholder: "Busque e selecione os alunos",
+        width: '100%'
+    });
+});
 
     </div>
 </div>
@@ -247,6 +258,192 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+</script>
+
+<div id="modal-horarios" class="modal-overlay" style="display: none;"> 
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Grade de Horários da Turma</h3>
+            <button type="button" id="fechar-modal-horarios" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <table class="grade-horarios">
+                <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th>Segunda-feira</th>
+                        <th>Terça-feira</th>
+                        <th>Quarta-feira</th>
+                        <th>Quinta-feira</th>
+                        <th>Sexta-feira</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>07:30 - 08:20</td>
+                        <td class="slot-horario" data-dia="2" data-hora-inicio="08:00"></td>
+                        <td class="slot-horario" data-dia="3" data-hora-inicio="08:00"></td>
+                        <td class="slot-horario" data-dia="4" data-hora-inicio="08:00"></td>
+                        <td class="slot-horario" data-dia="5" data-hora-inicio="08:00"></td>
+                        <td class="slot-horario" data-dia="6" data-hora-inicio="08:00"></td>
+                    </tr>
+                    <tr>
+                        <td>08:20 - 09:10</td>
+                        <td class="slot-horario" data-dia="2" data-hora-inicio="08:20"></td>
+                        <td class="slot-horario" data-dia="3" data-hora-inicio="08:20"></td>
+                        <td class="slot-horario" data-dia="4" data-hora-inicio="08:20"></td>
+                        <td class="slot-horario" data-dia="5" data-hora-inicio="08:20"></td>
+                        <td class="slot-horario" data-dia="6" data-hora-inicio="08:20"></td>
+                    </tr>
+                    <tr>
+                        <td>09:10 - 10:00</td>
+                        <td class="slot-horario" data-dia="2" data-hora-inicio="09:10"></td>
+                        <td class="slot-horario" data-dia="3" data-hora-inicio="09:10"></td>
+                        <td class="slot-horario" data-dia="4" data-hora-inicio="09:10"></td>
+                        <td class="slot-horario" data-dia="5" data-hora-inicio="09:10"></td>
+                        <td class="slot-horario" data-dia="6" data-hora-inicio="09:10"></td>
+                    </tr>
+                    <tr>
+                        <td>10:00 - 10:50</td>
+                        <td class="slot-horario" data-dia="2" data-hora-inicio="10:00"></td>
+                        <td class="slot-horario" data-dia="3" data-hora-inicio="10:00"></td>
+                        <td class="slot-horario" data-dia="4" data-hora-inicio="10:00"></td>
+                        <td class="slot-horario" data-dia="5" data-hora-inicio="10:00"></td>
+                        <td class="slot-horario" data-dia="6" data-hora-inicio="10:00"></td>
+                    </tr>
+                    <tr>
+                        <td>10:50 - 11:40</td>
+                        <td class="slot-horario" data-dia="2" data-hora-inicio="10:50"></td>
+                        <td class="slot-horario" data-dia="3" data-hora-inicio="10:50"></td>
+                        <td class="slot-horario" data-dia="4" data-hora-inicio="10:50"></td>
+                        <td class="slot-horario" data-dia="5" data-hora-inicio="10:50"></td>
+                        <td class="slot-horario" data-dia="6" data-hora-inicio="10:50"></td>
+                    </tr>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modal-selecao" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h4>Adicionar Aula</h4>
+            <button type="button" id="fechar-modal-selecao" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="selecao-dia-semana">
+            <input type="hidden" id="selecao-hora-inicio">
+            
+            <div class="form-group">
+                <label for="selecao_disciplina">Disciplina</label>
+                <select id="selecao_disciplina">
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="selecao_professor">Professor</label>
+                <select id="selecao_professor">
+                    </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="salvar-horario" class="btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Dados do PHP para o JavaScript ---
+    const disciplinas = <?php echo json_encode($pdo->query("SELECT id, nome_disciplina FROM disciplinas")->fetchAll(PDO::FETCH_ASSOC)); ?>;
+    const professores = <?php echo json_encode($pdo->query("SELECT id, nome_completo FROM professores")->fetchAll(PDO::FETCH_ASSOC)); ?>;
+
+    // --- Elementos do DOM ---
+    const btnAbrirGrade = document.getElementById('btn-abrir-grade');
+    const modalHorarios = document.getElementById('modal-horarios');
+    const btnFecharModalHorarios = document.getElementById('fechar-modal-horarios');
+    
+    const modalSelecao = document.getElementById('modal-selecao');
+    const btnFecharModalSelecao = document.getElementById('fechar-modal-selecao');
+    const btnSalvarHorario = document.getElementById('salvar-horario');
+    
+    const selectDisciplina = document.getElementById('selecao_disciplina');
+    const selectProfessor = document.getElementById('selecao_professor');
+    let slotClicado = null;
+
+    // --- Funções do Modal ---
+    if (btnAbrirGrade) {
+        btnAbrirGrade.addEventListener('click', () => modalHorarios.style.display = 'flex');
+    }
+    if (btnFecharModalHorarios) {
+        btnFecharModalHorarios.addEventListener('click', () => modalHorarios.style.display = 'none');
+    }
+    if (btnFecharModalSelecao) {
+        btnFecharModalSelecao.addEventListener('click', () => modalSelecao.style.display = 'none');
+    }
+
+    // --- Lógica da Grade ---
+    document.querySelectorAll('.slot-horario').forEach(slot => {
+        slot.addEventListener('click', function() {
+            slotClicado = this;
+            // Guarda as informações do slot clicado
+            document.getElementById('selecao-dia-semana').value = this.dataset.dia;
+            document.getElementById('selecao-hora-inicio').value = this.dataset.horaInicio;
+            
+            // Popula os dropdowns do modal de seleção
+            selectDisciplina.innerHTML = '<option value="">Selecione...</option>' + disciplinas.map(d => `<option value="${d.id}">${d.nome_disciplina}</option>`).join('');
+            selectProfessor.innerHTML = '<option value="">Selecione...</option>' + professores.map(p => `<option value="${p.id}">${p.nome_completo}</option>`).join('');
+            
+            modalSelecao.style.display = 'flex';
+        });
+    });
+
+    // --- Lógica do AJAX para Salvar ---
+    if (btnSalvarHorario) {
+        btnSalvarHorario.addEventListener('click', function() {
+            const dadosHorario = {
+                step: 3, // Identifica a ação no script PHP
+                action: 'salvar_horario', // Ação específica
+                dia_semana: document.getElementById('selecao-dia-semana').value,
+                hora_inicio: document.getElementById('selecao-hora-inicio').value,
+                id_disciplina: selectDisciplina.value,
+                id_professor: selectProfessor.value
+            };
+
+            // Envia os dados para o backend via AJAX/Fetch
+            fetch('processa_cadastro_turma.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosHorario)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    modalSelecao.style.display = 'none';
+
+                    // 2. Pega o NOME da disciplina e do professor selecionados para exibir na tela
+                    const nomeDisciplina = selectDisciplina.options[selectDisciplina.selectedIndex].text;
+                    const nomeProfessor = selectProfessor.options[selectProfessor.selectedIndex].text;
+                    
+                    // 3. Monta o HTML que será inserido na grade
+                    const novoConteudo = `
+                        <strong>${nomeDisciplina}</strong>
+                        <small>${nomeProfessor}</small>
+                    `;
+
+                    // 4. Verifica se temos um slot guardado e atualiza seu conteúdo e estilo
+                    if (slotClicado) {
+                        slotClicado.innerHTML = novoConteudo;
+                        slotClicado.classList.add('slot-preenchido');
+                    }
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Erro no AJAX:', error));
+        });
+    }
+});
 </script>
 
 <?php require 'templates/footer.php'; ?>
