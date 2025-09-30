@@ -567,7 +567,8 @@ body.auth-page {
 .form-card input[type="text"],
 .form-card input[type="email"],
 .form-card input[type="date"],
-.form-card input[type="password"] {
+.form-card input[type="password"],
+.form-card input[type="number"] {
     background-color: #f8fafc; /* Fundo cinza bem claro */
     border: 1px solid #e2e8f0; /* Borda sutil */
     padding: 12px;
