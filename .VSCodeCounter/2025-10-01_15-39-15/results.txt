@@ -1,0 +1,76 @@
+Date : 2025-10-01 15:39:15
+Directory : /srv/http/meuprojeto/Projeto_Cadastro_Alunos
+Total : 41 files,  4760 codes, 395 comments, 591 blanks, all 5746 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PHP        |         36 |      3,336 |        332 |        506 |      4,174 |
+| PostCSS    |          1 |        840 |         60 |         75 |        975 |
+| JSON       |          2 |        561 |          0 |          2 |        563 |
+| JavaScript |          1 |         12 |          3 |          8 |         23 |
+| HTML       |          1 |         11 |          0 |          0 |         11 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                        | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                           |         41 |      4,760 |        395 |        591 |      5,746 |
+| . (Files)                                                                                   |         33 |      3,583 |        282 |        442 |      4,307 |
+| ForaDoProjeto                                                                               |          2 |         64 |         11 |         16 |         91 |
+| actions                                                                                     |          1 |         69 |         13 |         13 |         95 |
+| api                                                                                         |          1 |         93 |         16 |         19 |        128 |
+| css                                                                                         |          1 |        840 |         60 |         75 |        975 |
+| js                                                                                          |          1 |         12 |          3 |          8 |         23 |
+| templates                                                                                   |          2 |         99 |         10 |         18 |        127 |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                    | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/ForaDoProjeto/cadastro_aluno_foraDoProjeto.php | PHP        |         29 |          1 |          9 |         39 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/ForaDoProjeto/salvar_aluno_foraDoProjeto.php   | PHP        |         35 |         10 |          7 |         52 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/actions/turma_criar.php                        | PHP        |         69 |         13 |         13 |         95 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/adicionar_avisos.php                           | PHP        |        381 |         11 |         28 |        420 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/api/login.php                                  | PHP        |         93 |         16 |         19 |        128 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/api_buscar_alunos.php                          | PHP        |         36 |         15 |         13 |         64 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/api_buscar_series.php                          | PHP        |         25 |          8 |          8 |         41 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/api_gerenciar_turma.php                        | PHP        |        109 |         13 |         22 |        144 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/cadastro_concluido.php                         | PHP        |         95 |         11 |         11 |        117 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/cadastro_geral.php                             | PHP        |        363 |         38 |         74 |        475 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/cadastro_professor.php                         | PHP        |        212 |          8 |         20 |        240 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/cadastro_responsalvel_foraDoProjeto.html       | HTML       |         11 |          0 |          0 |         11 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/cadastro_turma.php                             | PHP        |        117 |         12 |         14 |        143 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/composer.json                                  | JSON       |          6 |          0 |          1 |          7 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/composer.lock                                  | JSON       |        555 |          0 |          1 |        556 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/conexao.php                                    | PHP        |         22 |          8 |          5 |         35 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/criar_usuario.php                              | PHP        |         14 |          4 |          4 |         22 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/css/style.css                                  | PostCSS    |        840 |         60 |         75 |        975 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/detalhes_turma.php                             | PHP        |        126 |         10 |         17 |        153 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/edit.php                                       | PHP        |         39 |          4 |          6 |         49 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/editar_formulario.php                          | PHP        |         66 |          6 |         14 |         86 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/editar_turma.php                               | PHP        |        240 |         10 |         28 |        278 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/esqueci_senha.php                              | PHP        |         25 |          0 |          2 |         27 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/excluir_aviso.php                              | PHP        |         25 |         14 |         11 |         50 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/gerenciar_turmas.php                           | PHP        |        127 |          2 |         13 |        142 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/index.php                                      | PHP        |         11 |         12 |          2 |         25 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/js/main.js                                     | JavaScript |         12 |          3 |          8 |         23 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/login.php                                      | PHP        |         61 |          1 |         10 |         72 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/logout.php                                     | PHP        |          9 |          5 |          4 |         18 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/painel.php                                     | PHP        |        393 |          8 |         30 |        431 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_cadastro_geral.php                    | PHP        |         62 |         12 |         11 |         85 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_cadastro_professor.php                | PHP        |         95 |         11 |         17 |        123 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_cadastro_turma.php                    | PHP        |         59 |          8 |         10 |         77 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_esqueci_senha.php                     | PHP        |         28 |         12 |         12 |         52 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_login.php                             | PHP        |         59 |         13 |         16 |         88 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processa_redefinir_senha.php                   | PHP        |         26 |          6 |          7 |         39 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/processar_aviso.php                            | PHP        |         60 |         11 |         15 |         86 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/redefinir_senha.php                            | PHP        |         36 |          1 |          7 |         44 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/templates/footer.php                           | PHP        |         26 |          4 |          6 |         36 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/templates/header.php                           | PHP        |         73 |          6 |         12 |         91 |
+| /srv/http/meuprojeto/Projeto_Cadastro_Alunos/teste_foto.php                                 | PHP        |         90 |          8 |          9 |        107 |
+| Total                                                                                       |            |      4,760 |        395 |        591 |      5,746 |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
