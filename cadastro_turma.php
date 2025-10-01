@@ -61,13 +61,8 @@ unset($_SESSION['form_data']);
                 </div>
                 <div class="form-group">
                     <label for="id_serie">Série / Ano *</label>
-                    <select name="id_serie" id="id_serie" required>
-                         <option value="">Selecione...</option>
-                        <?php foreach ($series as $serie): ?>
-                            <option value="<?php echo $serie['id']; ?>" <?php echo (($dados_antigos['id_serie'] ?? '') == $serie['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($serie['nome']); ?>
-                            </option>
-                        <?php endforeach; ?>
+                    <select name="id_serie" id="id_serie" required disabled>
+                        <option value="">Primeiro, selecione o Nível de Ensino</option>
                     </select>
                 </div>
             </div>
@@ -77,11 +72,11 @@ unset($_SESSION['form_data']);
                     <select name="turno" id="turno" required>
                         <option value="">Selecione...</option>
                         <?php $turno_selecionado = $dados_antigos['turno'] ?? ''; ?>
-                        <option value="Manhã" <?php echo ($turno_selecionado == 'Manhã') ? 'selected' : ''; ?>>Manhã</option>
-                        <option value="Tarde" <?php echo ($turno_selecionado == 'Tarde') ? 'selected' : ''; ?>>Tarde</option>
-                        <option value="Noite" <?php echo ($turno_selecionado == 'Noite') ? 'selected' : ''; ?>>Noite</option>
+                        <option value="Matutino" <?php echo ($turno_selecionado == 'Matutino') ? 'selected' : ''; ?>>Manhã</option>
+                        <option value="Vespertino" <?php echo ($turno_selecionado == 'Vespertino') ? 'selected' : ''; ?>>Tarde</option>
+                        <option value="Noturno" <?php echo ($turno_selecionado == 'Noturno') ? 'selected' : ''; ?>>Noite</option>
                         <option value="Integral" <?php echo ($turno_selecionado == 'Integral') ? 'selected' : ''; ?>>Integral</option>
-                    </select>
+                </select>
                 </div>
                 <div class="form-group">
                     <label for="numero_maximo_alunos">Nº Máximo de Alunos</label>
@@ -94,5 +89,55 @@ unset($_SESSION['form_data']);
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona os dois dropdowns
+    const selectNivel = document.getElementById('id_nivel_ensino');
+    const selectSerie = document.getElementById('id_serie');
+
+    // Garante que os elementos existem na página
+    if (selectNivel && selectSerie) {
+        
+        // Adiciona um "ouvinte" para o evento de MUDANÇA no select de Nível
+        selectNivel.addEventListener('change', function() {
+            const nivelId = this.value; // Pega o ID do nível de ensino selecionado
+
+            // Limpa e desabilita o select de séries enquanto busca
+            selectSerie.innerHTML = '<option value="">Carregando séries...</option>';
+            selectSerie.disabled = true;
+
+            // Se o usuário selecionar "Selecione...", reseta o campo de séries
+            if (!nivelId) {
+                selectSerie.innerHTML = '<option value="">Primeiro, selecione o Nível de Ensino</option>';
+                return;
+            }
+
+            // Faz a chamada AJAX para a nossa API
+            fetch(`api_buscar_series.php?id_nivel=${nivelId}`)
+                .then(response => response.json())
+                .then(series => {
+                    // Limpa a mensagem "Carregando..."
+                    selectSerie.innerHTML = '<option value="">Selecione a série...</option>';
+
+                    // Preenche o select de séries com os dados recebidos do PHP
+                    series.forEach(serie => {
+                        const option = document.createElement('option');
+                        option.value = serie.id;
+                        option.textContent = serie.nome;
+                        selectSerie.appendChild(option);
+                    });
+
+                    // Habilita o select de séries para o usuário
+                    selectSerie.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar séries:', error);
+                    selectSerie.innerHTML = '<option value="">Erro ao carregar séries</option>';
+                });
+        });
+    }
+});
+</script>
 
 <?php require 'templates/footer.php'; ?>
