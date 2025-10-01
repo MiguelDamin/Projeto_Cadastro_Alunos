@@ -567,7 +567,8 @@ body.auth-page {
 .form-card input[type="text"],
 .form-card input[type="email"],
 .form-card input[type="date"],
-.form-card input[type="password"] {
+.form-card input[type="password"],
+.form-card input[type="number"] {
     background-color: #f8fafc; /* Fundo cinza bem claro */
     border: 1px solid #e2e8f0; /* Borda sutil */
     padding: 12px;
@@ -737,3 +738,28 @@ body.auth-page {
 .botoes-acao a i {
     font-size: 1em; /* Garante que o ícone tenha o mesmo tamanho da fonte */
 }
+/* --- ESTILOS PARA O MODAL --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-content {
+    background: #fff; padding: 20px; border-radius: 8px;
+    width: 90%; max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;
+}
+.modal-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
+/* --- ESTILOS PARA A GRADE DE HORÁRIOS --- */
+.grade-horarios { width: 100%; border-collapse: collapse; }
+.grade-horarios th, .grade-horarios td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+.grade-horarios th { background-color: #f2f2f2; }
+.slot-horario { cursor: pointer; min-height: 50px; transition: background-color 0.2s; }
+.slot-horario:hover { background-color: #e8f4ff; }
+.slot-preenchido { background-color: #d4edda; font-size: 0.8em; }
+.slot-preenchido small { display: block; color: #555; }

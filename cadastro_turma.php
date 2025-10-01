@@ -1,151 +1,143 @@
-<?php 
-require 'templates/header.php'; 
-require 'conexao.php';
+<?php
+// cadastro_turma.php (VERSÃO REATORADA)
+session_start();
+require_once 'templates/header.php';
+require_once 'conexao.php';
 
-// Processar cadastro de nova turma
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cadastrar_turma'])) {
-    $nome_turma = $_POST['nome_turma'];
-    $ano_letivo = $_POST['ano_letivo'];
-    $periodo = $_POST['periodo'];
-    
-    try {
-        // Usando apenas os campos que existem na sua tabela
-        $sql = "INSERT INTO turmas (nome_turma, ano_letivo, periodo) VALUES (?, ?, ?)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nome_turma, $ano_letivo, $periodo]);
-        
-        $sucesso = "Turma cadastrada com sucesso!";
-    } catch (PDOException $e) {
-        $erro = "Erro ao cadastrar: " . $e->getMessage();
-    }
-}
+// Busca dados para os dropdowns
+$niveis_ensino = $pdo->query("SELECT id, nome FROM niveis_ensino ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
+$series = $pdo->query("SELECT id, nome FROM series ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-// Buscar turmas existentes - adaptado para sua estrutura
-try {
-    // Primeiro vamos tentar buscar só da tabela turmas
-    $turmas = $pdo->query("SELECT * FROM turmas ORDER BY ano_letivo DESC, nome_turma ASC")->fetchAll();
-} catch (PDOException $e) {
-    $turmas = [];
-    $erro = "Erro ao carregar turmas: " . $e->getMessage();
-}
+// Pega dados antigos em caso de erro de validação
+$dados_antigos = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_data']);
 ?>
 
-<h2>Cadastrar Turma</h2>
-
-<?php if (isset($sucesso)): ?>
-    <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-        ✅ <?php echo $sucesso; ?>
-    </div>
-<?php endif; ?>
-
-<?php if (isset($erro)): ?>
-    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-        ❌ <?php echo $erro; ?>
-    </div>
-<?php endif; ?>
-
-<!-- Formulário -->
-<form method="POST" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-    <h3>Nova Turma</h3>
-    
-    <div class="form-row">
-        <div class="form-group">
-            <label for="nome_turma">Nome da Turma:</label>
-            <select name="nome_turma" id="nome_turma" required>
-                <option value="">Selecione...</option>
-                <option value="1° Ano A">1° Ano A</option>
-                <option value="1° Ano B">1° Ano B</option>
-                <option value="1° Ano C">1° Ano C</option>
-                <option value="2° Ano A">2° Ano A</option>
-                <option value="2° Ano B">2° Ano B</option>
-                <option value="2° Ano C">2° Ano C</option>
-                <option value="3° Ano A">3° Ano A</option>
-                <option value="3° Ano B">3° Ano B</option>
-                <option value="3° Ano C">3° Ano C</option>
-            </select>
+<div class="form-card">
+    <div class="page-top-header">
+        <div>
+            <h2>Criar Nova Turma</h2>
+            <p>Preencha os dados essenciais para criar a turma. Os detalhes como horários e alunos serão adicionados a seguir.</p>
         </div>
-        <div class="form-group">
-            <label for="ano_letivo">Ano Letivo:</label>
-            <select name="ano_letivo" id="ano_letivo" required>
-                <option value="">Selecione...</option>
-                <option value="2024">2024</option>
-                <option value="2025" selected>2025</option>
-                <option value="2026">2026</option>
-            </select>
-        </div>
+        <a href="painel_turmas.php" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Lista</a>
     </div>
 
-    <div class="form-row">
-        <div class="form-group">
-            <label for="periodo">Período:</label>
-            <select name="periodo" id="periodo" required>
-                <option value="">Selecione...</option>
-                <option value="Matutino">Matutino</option>
-                <option value="Vespertino">Vespertino</option>
-                <option value="Noturno">Noturno</option>
-                <option value="Integral">Integral</option>
-            </select>
+    <?php if (isset($_SESSION['form_errors'])): ?>
+        <div class="form-message error spaced">
+            <strong>Ocorreram erros:</strong>
+            <ul>
+                <?php foreach ($_SESSION['form_errors'] as $error): ?>
+                    <li><?php echo htmlspecialchars($error); ?></li>
+                <?php endforeach; ?>
+            </ul>
         </div>
-    </div>
+        <?php unset($_SESSION['form_errors']); ?>
+    <?php endif; ?>
 
-    <button type="submit" name="cadastrar_turma">Cadastrar Turma</button>
-</form>
+    <form action="actions/turma_criar.php" method="POST">
+        <fieldset>
+            <legend>1. Identificação e Estrutura</legend>
+            <div class="form-row">
+                <div class="form-group flex-2">
+                    <label for="nome_turma">Nome da Turma *</label>
+                    <input type="text" name="nome_turma" id="nome_turma" required value="<?php echo htmlspecialchars($dados_antigos['nome_turma'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="ano_letivo">Ano Letivo *</label>
+                    <input type="number" name="ano_letivo" id="ano_letivo" value="<?php echo htmlspecialchars($dados_antigos['ano_letivo'] ?? date('Y')); ?>" required>
+                </div>
+            </div>
+             <div class="form-row">
+                <div class="form-group">
+                    <label for="id_nivel_ensino">Nível de Ensino *</label>
+                    <select name="id_nivel_ensino" id="id_nivel_ensino" required>
+                        <option value="">Selecione...</option>
+                        <?php foreach ($niveis_ensino as $nivel): ?>
+                            <option value="<?php echo $nivel['id']; ?>" <?php echo (($dados_antigos['id_nivel_ensino'] ?? '') == $nivel['id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($nivel['nome']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_serie">Série / Ano *</label>
+                    <select name="id_serie" id="id_serie" required disabled>
+                        <option value="">Primeiro, selecione o Nível de Ensino</option>
+                    </select>
+                </div>
+            </div>
+             <div class="form-row">
+                <div class="form-group">
+                    <label for="turno">Turno *</label>
+                    <select name="turno" id="turno" required>
+                        <option value="">Selecione...</option>
+                        <?php $turno_selecionado = $dados_antigos['turno'] ?? ''; ?>
+                        <option value="Matutino" <?php echo ($turno_selecionado == 'Matutino') ? 'selected' : ''; ?>>Manhã</option>
+                        <option value="Vespertino" <?php echo ($turno_selecionado == 'Vespertino') ? 'selected' : ''; ?>>Tarde</option>
+                        <option value="Noturno" <?php echo ($turno_selecionado == 'Noturno') ? 'selected' : ''; ?>>Noite</option>
+                        <option value="Integral" <?php echo ($turno_selecionado == 'Integral') ? 'selected' : ''; ?>>Integral</option>
+                </select>
+                </div>
+                <div class="form-group">
+                    <label for="numero_maximo_alunos">Nº Máximo de Alunos</label>
+                    <input type="number" name="numero_maximo_alunos" id="numero_maximo_alunos" min="1" value="<?php echo htmlspecialchars($dados_antigos['numero_maximo_alunos'] ?? '30'); ?>">
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Criar Turma e Continuar</button>
+        </div>
+    </form>
+</div>
 
-<!-- Lista de Turmas -->
-<h3>Turmas Cadastradas</h3>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona os dois dropdowns
+    const selectNivel = document.getElementById('id_nivel_ensino');
+    const selectSerie = document.getElementById('id_serie');
 
-<?php if (empty($turmas)): ?>
-    <p style="text-align: center; color: #666; padding: 20px;">
-        Nenhuma turma cadastrada ainda.
-    </p>
-<?php else: ?>
-    <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-        <thead>
-            <tr style="background: #007bff; color: white;">
-                <th style="padding: 12px; border: 1px solid #ddd;">ID</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Nome da Turma</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Ano Letivo</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Período</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($turmas as $turma): ?>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo $turma['id']; ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">
-                        <?php echo htmlspecialchars($turma['nome_turma']); ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo htmlspecialchars($turma['ano_letivo']); ?>
-                    </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <?php echo htmlspecialchars($turma['periodo']); ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-<?php endif; ?>
+    // Garante que os elementos existem na página
+    if (selectNivel && selectSerie) {
+        
+        // Adiciona um "ouvinte" para o evento de MUDANÇA no select de Nível
+        selectNivel.addEventListener('change', function() {
+            const nivelId = this.value; // Pega o ID do nível de ensino selecionado
 
-<style>
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
+            // Limpa e desabilita o select de séries enquanto busca
+            selectSerie.innerHTML = '<option value="">Carregando séries...</option>';
+            selectSerie.disabled = true;
 
-table tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+            // Se o usuário selecionar "Selecione...", reseta o campo de séries
+            if (!nivelId) {
+                selectSerie.innerHTML = '<option value="">Primeiro, selecione o Nível de Ensino</option>';
+                return;
+            }
 
-table tr:hover {
-    background-color: #e9ecef;
-}
-</style>
+            // Faz a chamada AJAX para a nossa API
+            fetch(`api_buscar_series.php?id_nivel=${nivelId}`)
+                .then(response => response.json())
+                .then(series => {
+                    // Limpa a mensagem "Carregando..."
+                    selectSerie.innerHTML = '<option value="">Selecione a série...</option>';
+
+                    // Preenche o select de séries com os dados recebidos do PHP
+                    series.forEach(serie => {
+                        const option = document.createElement('option');
+                        option.value = serie.id;
+                        option.textContent = serie.nome;
+                        selectSerie.appendChild(option);
+                    });
+
+                    // Habilita o select de séries para o usuário
+                    selectSerie.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar séries:', error);
+                    selectSerie.innerHTML = '<option value="">Erro ao carregar séries</option>';
+                });
+        });
+    }
+});
+</script>
 
 <?php require 'templates/footer.php'; ?>
