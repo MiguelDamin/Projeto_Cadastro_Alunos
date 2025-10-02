@@ -6,6 +6,25 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 require 'conexao.php';
 
+// CONTROLE DE ACESSO: Verificar se o usuário tem permissão para gerenciar avisos
+$perfis_autorizados = ['administrador', 'diretor', 'secretaria', 'professor'];
+
+// Buscar o perfil do usuário atual
+try {
+    $stmt = $pdo->prepare("SELECT perfil FROM usuarios WHERE id = ?");
+    $stmt->execute([$_SESSION['usuario_id']]);
+    $usuario_atual = $stmt->fetch();
+    
+    if (!$usuario_atual || !in_array($usuario_atual['perfil'], $perfis_autorizados)) {
+        // Se o usuário não tem permissão, redireciona para o painel com mensagem
+        header("Location: painel.php?erro=acesso_negado");
+        exit;
+    }
+} catch (PDOException $e) {
+    header("Location: painel.php?erro=erro_sistema");
+    exit;
+}
+
 $mensagem_sucesso = '';
 $mensagem_erro = '';
 
@@ -403,13 +422,13 @@ require 'templates/header.php';
                                 <?php endif; ?>
                             </td>
                             <td class="actions" style="text-align: right;">
+                                <a href="editar_aviso.php?id=<?php echo $aviso['id']; ?>" class="btn-edit">Editar</a>
                                 <a href="excluir_aviso.php?id=<?php echo $aviso['id']; ?>" class="btn-delete" onclick="return confirm('Tem certeza que deseja excluir este aviso?');">Excluir</a>
-                                
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-                                
+            </table>
         <?php endif; ?>
     </div>
 </div>
