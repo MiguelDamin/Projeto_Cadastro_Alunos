@@ -1,85 +1,157 @@
 <?php
-// Inicia a sessão para verificar o login.
 session_start();
 require_once 'conexao.php';
 
-// --- 1. VERIFICAÇÕES DE SEGURANÇA ---
+// --- VERIFICAÇÕES DE SEGURANÇA ---
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: cadastro_turma.php');
+    header('Location: cadastro_geral.php');
     exit;
 }
 
-// --- 2. COLETA E LIMPEZA DOS DADOS DO FORMULÁRIO ---
-$nome_turma = trim($_POST['nome_turma'] ?? '');
-$ano_letivo = (int)($_POST['ano_letivo'] ?? 0);
-$codigo_turma = trim($_POST['codigo_turma'] ?? '');
-$nivel_ensino = $_POST['nivel_ensino'] ?? '';
-$serie_ano = $_POST['serie_ano'] ?? '';
-$turno = $_POST['turno'] ?? '';
-$max_alunos = (int)($_POST['numero_maximo_alunos'] ?? 0);
-$data_inicio = $_POST['data_inicio'] ?: null;
-$data_fim = $_POST['data_fim'] ?: null;
-$status = $_POST['status'] ?? 'Aberta';
-$id_professor_regente = (int)($_POST['id_professor_regente'] ?? 0);
-$id_sala_aula = (int)($_POST['id_sala'] ?? 0); // Presumindo que você adicione este campo no formulário
-$descricao = trim($_POST['descricao'] ?? '');
+$step = (int)($_POST['step'] ?? 0);
 
-// --- 3. VALIDAÇÃO DOS DADOS ---
-if (empty($nome_turma) || empty($ano_letivo) || empty($nivel_ensino) || empty($serie_ano) || empty($turno)) {
-    die("Erro: Nome da Turma, Ano Letivo, Nível, Série e Turno são obrigatórios. Por favor, volte e preencha todos.");
-}
-
-// Se o código da turma veio vazio, gera um automaticamente
-if (empty($codigo_turma)) {
-    $nivelSigla = strtoupper(implode('', array_map(function($word) { return $word[0]; }, explode(' ', $nivel_ensino))));
-    $nomeSigla = strtoupper(str_replace([' ', 'º', 'ª'], '', $nome_turma));
-    $turnoSigla = strtoupper(substr($turno, 0, 1));
-    $codigo_turma = "{$ano_letivo}-{$nivelSigla}-{$nomeSigla}-{$turnoSigla}";
-}
-
-// --- 4. EXECUÇÃO NO BANCO DE DADOS ---
-$pdo->beginTransaction();
-try {
-    // A instrução SQL agora corresponde EXATAMENTE à sua tabela
-    $sql_turma = "INSERT INTO turmas 
-                    (nome_turma, ano_letivo, periodo, codigo_turma, nivel_ensino, serie_ano, numero_maximo_alunos, data_inicio, data_fim, id_sala_aula, id_professor_regente, status, descricao) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                  
-    $stmt_turma = $pdo->prepare($sql_turma);
+if ($step === 1) {
+    // --- PROCESSA O PASSO 1: DADOS DO RESPONSÁVEL ---
     
-    // A ordem das variáveis no execute() DEVE seguir a ordem das colunas no INSERT
-    $stmt_turma->execute([
-        $nome_turma,
-        $ano_letivo,
-        $turno, // Coluna `periodo` no banco
-        $codigo_turma,
-        $nivel_ensino,
-        $serie_ano,
-        $max_alunos > 0 ? $max_alunos : null,
-        $data_inicio,
-        $data_fim,
-        $id_sala_aula > 0 ? $id_sala_aula : null,
-        $id_professor_regente > 0 ? $id_professor_regente : null,
-        $status,
-        $descricao
-    ]);
+    // Coleta e armazena os dados do responsável na sessão
+    $_SESSION['dados_responsavel'] = $_POST;
     
-    // Se a inserção foi bem-sucedida, confirma as alterações no banco.
-    $pdo->commit();
-
-    // Redireciona para o painel com uma mensagem de sucesso.
-    header('Location: painel.php?sucesso=turma_cadastrada');
+    // Validação básica (pode ser mais robusta)
+    if (empty($_POST['nome_completo_resp']) || empty($_POST['cpf_resp']) || empty($_POST['email_resp'])) {
+        $_SESSION['upload_error'] = "Por favor, preencha todos os campos obrigatórios do responsável.";
+        header('Location: cadastro_geral.php');
+        exit;
+    }
+    
+    // Avança para o próximo passo
+    $_SESSION['step'] = 2;
+    header('Location: cadastro_geral.php');
     exit;
 
-} catch (PDOException $e) {
-    // Se qualquer erro ocorreu durante a inserção, desfaz a operação.
-    $pdo->rollBack();
+} elseif ($step === 2) {
+    // --- PROCESSA O PASSO 2: DADOS DO ALUNO E FINALIZAÇÃO ---
     
-    // Exibe a mensagem de erro específica do banco de dados para depuração.
-    die("Erro ao salvar a turma no banco de dados: " . $e->getMessage());
+    // Guarda os dados do aluno na sessão para repopular em caso de erro
+    $_SESSION['form_data_aluno'] = $_POST;
+
+    // Validação dos dados do aluno
+    if (empty($_POST['nome_completo_aluno']) || empty($_POST['data_nascimento_aluno']) || empty($_POST['cpf_aluno'])) {
+        $_SESSION['upload_error'] = "Por favor, preencha todos os campos obrigatórios do aluno.";
+        header('Location: cadastro_geral.php');
+        exit;
+    }
+
+    // Inicia a transação para garantir que ambos os cadastros (ou nenhum) sejam feitos
+    $pdo->beginTransaction();
+
+    try {
+        // --- 1. INSERE OU ATUALIZA O RESPONSÁVEL ---
+        $dados_resp = $_SESSION['dados_responsavel'];
+        $id_responsavel = $dados_resp['id_resp'] ?? null;
+
+        // Limpa máscaras
+        $cpf_resp_limpo = preg_replace('/[^\d]/', '', $dados_resp['cpf_resp']);
+        $cep_resp_limpo = preg_replace('/[^\d]/', '', $dados_resp['cep_resp']);
+
+        if ($id_responsavel) {
+            // Atualiza um responsável existente
+            $sql_resp = "UPDATE responsaveis SET nome_completo=?, cpf=?, grau_parentesco=?, email=?, telefone=?, cep=?, logradouro=?, numero=?, complemento=?, bairro=?, cidade=?, uf=? WHERE id=?";
+            $stmt_resp = $pdo->prepare($sql_resp);
+            $stmt_resp->execute([
+                $dados_resp['nome_completo_resp'], $cpf_resp_limpo, $dados_resp['grau_parentesco_resp'], $dados_resp['email_resp'], $dados_resp['telefone_resp'],
+                $cep_resp_limpo, $dados_resp['logradouro_resp'], $dados_resp['numero_resp'], $dados_resp['complemento_resp'], $dados_resp['bairro_resp'], $dados_resp['cidade_resp'], $dados_resp['uf_resp'],
+                $id_responsavel
+            ]);
+        } else {
+            // Insere um novo responsável
+            $sql_resp = "INSERT INTO responsaveis (nome_completo, cpf, grau_parentesco, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_resp = $pdo->prepare($sql_resp);
+            $stmt_resp->execute([
+                $dados_resp['nome_completo_resp'], $cpf_resp_limpo, $dados_resp['grau_parentesco_resp'], $dados_resp['email_resp'], $dados_resp['telefone_resp'],
+                $cep_resp_limpo, $dados_resp['logradouro_resp'], $dados_resp['numero_resp'], $dados_resp['complemento_resp'], $dados_resp['bairro_resp'], $dados_resp['cidade_resp'], $dados_resp['uf_resp']
+            ]);
+            $id_responsavel = $pdo->lastInsertId();
+        }
+
+        // --- 2. PROCESSA UPLOAD DA FOTO (se houver) ---
+        $caminho_foto = null;
+        if (isset($_FILES['foto_aluno']) && $_FILES['foto_aluno']['error'] == 0) {
+            // --- VALIDAÇÕES DO ARQUIVO ---
+            $allowed_types = ['image/jpeg', 'image/png'];
+            $max_size = 2 * 1024 * 1024; // 2 MB
+
+            if (!in_array($_FILES['foto_aluno']['type'], $allowed_types)) {
+                throw new Exception("Formato de arquivo inválido. Apenas JPG e PNG são permitidos.");
+            }
+
+            if ($_FILES['foto_aluno']['size'] > $max_size) {
+                throw new Exception("O arquivo da foto é muito grande. O tamanho máximo é 2MB.");
+            }
+
+            // --- LÓGICA DE UPLOAD ---
+            $upload_dir = 'uploads/fotos_alunos/';
+            // Garante que o diretório exista e tenha as permissões corretas
+            if (!is_dir($upload_dir)) {
+                if (!mkdir($upload_dir, 0775, true)) {
+                    throw new Exception("Falha ao criar o diretório de uploads. Verifique as permissões do servidor.");
+                }
+            }
+
+            $file_info = pathinfo($_FILES['foto_aluno']['name']);
+            $file_ext = strtolower($file_info['extension']);
+            $caminho_foto = uniqid('aluno_', true) . '.' . $file_ext;
+            
+            if (!move_uploaded_file($_FILES['foto_aluno']['tmp_name'], $upload_dir . $caminho_foto)) {
+                // Mensagem de erro mais específica
+                throw new Exception("Falha ao mover o arquivo da foto. Verifique as permissões da pasta 'uploads/fotos_alunos/'.");
+            }
+        }
+
+        // --- 3. INSERE O ALUNO ---
+        $dados_aluno = $_SESSION['form_data_aluno'];
+        $cpf_aluno_limpo = preg_replace('/[^\d]/', '', $dados_aluno['cpf_aluno']);
+        // Converte data dd/mm/yyyy para yyyy-mm-dd
+        $data_nasc_formatada = DateTime::createFromFormat('d/m/Y', $dados_aluno['data_nascimento_aluno'])->format('Y-m-d');
+
+        $sql_aluno = "INSERT INTO alunos (nome_completo, data_nascimento, email, cpf, id_responsavel_principal, caminho_foto) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt_aluno = $pdo->prepare($sql_aluno);
+        $stmt_aluno->execute([
+            $dados_aluno['nome_completo_aluno'],
+            $data_nasc_formatada,
+            $dados_aluno['email_aluno'] ?: null,
+            $cpf_aluno_limpo,
+            $id_responsavel,
+            $caminho_foto
+        ]);
+        $id_aluno = $pdo->lastInsertId();
+
+        // Se tudo deu certo, confirma a transação
+        $pdo->commit();
+
+        // Limpa os dados da sessão para um novo cadastro
+        unset($_SESSION['dados_responsavel'], $_SESSION['form_data_aluno'], $_SESSION['step']);
+
+        // Redireciona para a página de sucesso
+        header('Location: cadastro_concluido.php?id=' . $id_aluno);
+        exit;
+
+    } catch (Exception $e) {
+        // Se algo deu errado, desfaz tudo
+        $pdo->rollBack();
+        
+        // Guarda a mensagem de erro e redireciona de volta
+        $_SESSION['upload_error'] = "Erro ao finalizar cadastro: " . $e->getMessage();
+        header('Location: cadastro_geral.php');
+        exit;
+    }
+    
+} else {
+    // Se o passo for inválido, redireciona para o início
+    header('Location: cadastro_geral.php?reset=1');
+    exit;
 }
 ?>
