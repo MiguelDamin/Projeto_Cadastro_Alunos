@@ -81,7 +81,7 @@ try {
     // --- REDIRECIONAMENTO ---
     // Após criar a turma, redireciona para a nova tela de "Gerenciar Turma",
     // onde o usuário poderá adicionar alunos, horários, etc.
-    header('Location: ../gerenciar_turma.php?id=' . $id_nova_turma . '&sucesso=turma_criada');
+    header('Location: ../gerenciar_turmas.php?id=' . $id_nova_turma . '&sucesso=turma_criada');
     exit;
 
 } catch (PDOException $e) {

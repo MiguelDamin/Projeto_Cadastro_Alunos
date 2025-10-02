@@ -544,6 +544,7 @@ body.auth-page {
     border-radius: 12px;
     padding: 40px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
 }
 .form-card h3 {
     font-size: 1.5rem;
@@ -763,3 +764,212 @@ body.auth-page {
 .slot-horario:hover { background-color: #e8f4ff; }
 .slot-preenchido { background-color: #d4edda; font-size: 0.8em; }
 .slot-preenchido small { display: block; color: #555; }
+
+/* --- ESTILOS PARA A PÁGINA DE GERENCIAMENTO --- */
+
+.filter-form .form-row {
+    align-items: flex-end; /* Alinha labels e inputs */
+}
+
+.filter-actions {
+    justify-content: flex-start;
+    gap: 10px;
+}
+.filter-actions .btn-primary, .filter-actions .btn-secondary {
+    padding: 10px 20px;
+    margin-top: 0;
+}
+.table-header-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.table-gerenciamento {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.table-gerenciamento th, .table-gerenciamento td {
+    border: 1px solid #e2e8f0;
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+.table-gerenciamento thead {
+    background-color: #f8fafc;
+}
+.table-gerenciamento th {
+    font-weight: 600;
+    color: #334155;
+}
+.table-gerenciamento tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+.table-gerenciamento tbody tr:hover {
+    background-color: #eff6ff;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.btn-action {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+.btn-action:hover { color: #0056e0; }
+.btn-action.btn-delete:hover { color: #dc3545; }
+
+/* Badges de Status */
+/* --- ESTILOS PARA OS BADGES DE STATUS --- */
+.badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status Aberta: Fundo azul, texto branco */
+.badge.status-aberta {
+    background-color: #e7f3ff;
+    color: #007bff;
+}
+
+/* Status Em Andamento: Fundo verde, texto branco */
+.badge.status-em-andamento {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Status Em Planejamento: Fundo amarelo, texto escuro */
+.badge.status-em-planejamento {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+/* Status Encerrada: Fundo cinza, texto branco */
+.badge.status-encerrada {
+    background-color: #e2e8f0;
+    color: #6c757d;
+}
+
+/* --- ESTILOS PARA A PÁGINA DE DETALHES DA TURMA --- */
+
+.gerenciar-turma-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Cria duas colunas de tamanho igual */
+    gap: 30px;
+}
+
+.full-width-card {
+    grid-column: 1 / -1; /* Faz o card ocupar todas as colunas */
+}
+
+.lista-detalhes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-detalhes li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.lista-detalhes li:last-child {
+    border-bottom: none;
+}
+
+.lista-detalhes li strong {
+    color: #334155;
+}
+
+.lista-alunos-detalhes .aluno-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.lista-alunos-detalhes .aluno-item:last-child {
+    border-bottom: none;
+}
+
+/* --- ESTILOS PARA AS FOTOS DE ALUNOS --- */
+
+.lista-alunos-detalhes .aluno-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.lista-alunos-detalhes .aluno-item:last-child {
+    border-bottom: none;
+}
+
+.foto-aluno-lista {
+    width: 50px;       /* Define a largura */
+    height: 50px;      /* Define a altura (precisa ser igual à largura para ser um quadrado) */
+    object-fit: cover; /* Corta a imagem para preencher o espaço, sem distorcer */
+    border-radius: 50%; /* Faz a mágica de arredondar para um círculo perfeito */
+    margin-right: 15px; /* Adiciona um espaço à direita da foto */
+    border: 2px solid #e2e8f0; /* Borda sutil */
+    flex-shrink: 0; /* Garante que a imagem não vai "encolher" se o texto for muito longo */
+}
+
+/* Ajustes para o texto do aluno */
+.lista-alunos-detalhes .aluno-item span {
+    font-size: 0.95rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+/* --- ESTILOS ADICIONAIS PARA BOTÕES E FEEDBACK --- */
+
+/* Novo estilo para o botão secundário (Cancelar) */
+.btn-secondary-outline {
+    background-color: transparent;
+    color: #6c757d;
+    border: 1px solid #ced4da;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-secondary-outline:hover {
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+/* Estilo para o botão em estado de "loading" */
+.btn-loading {
+    position: relative;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+}
+
+/* O ícone de spinner (inicialmente escondido) */
+.btn-loading .spinner {
+    display: none;
+    animation: spin 1s linear infinite;
+}
+
+/* Quando a classe .is-loading é adicionada, mostra o spinner e esconde o texto */
+.btn-loading.is-loading .spinner {
+    display: inline-block;
+}
+.btn-loading.is-loading .btn-text {
+    visibility: hidden;
+}
+
+/* Animação do spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

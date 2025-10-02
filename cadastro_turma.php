@@ -19,7 +19,7 @@ unset($_SESSION['form_data']);
             <h2>Criar Nova Turma</h2>
             <p>Preencha os dados essenciais para criar a turma. Os detalhes como horários e alunos serão adicionados a seguir.</p>
         </div>
-        <a href="painel_turmas.php" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Lista</a>
+        <a href="gerenciar_turmas.php" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Lista</a>
     </div>
 
     <?php if (isset($_SESSION['form_errors'])): ?>

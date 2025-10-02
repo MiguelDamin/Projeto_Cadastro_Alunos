@@ -55,6 +55,17 @@ if (!isset($_SESSION['usuario_id'])) {
                     <li><a href="#"><i class="fas fa-file-alt"></i><span>Relatório de Turmas</span></a></li>
                 </ul>
             </li>
+
+            <li class="has-submenu">
+                <a href="#" class="submenu-toggle">
+                    <div><i class="fas fa-folder-plus"></i><span>Turmas</span></div>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="gerenciar_turmas.php"><i class="fas fa-file-invoice"></i><span>Gerenciar Turmas</span></a></li>
+                </ul>
+            </li>
+
             
 
         </ul>
