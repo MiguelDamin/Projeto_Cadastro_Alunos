@@ -69,7 +69,12 @@ try {
             <hr>
             <h4><i class="fas fa-user-plus"></i> Matricular Novo Aluno</h4>
             <div class="form-group"><label for="select-adicionar-aluno">Buscar aluno por nome ou CPF</label><select id="select-adicionar-aluno" style="width: 100%;"></select></div>
-            <div class="form-actions"><button type="button" id="btn-adicionar-aluno" class="btn-primary">Matricular Aluno</button></div>
+            <div class="form-actions">
+                <button type="button" id="btn-adicionar-aluno" class="btn-primary btn-loading">
+                    <i class="fas fa-spinner fa-spin spinner"></i>
+                    <span class="btn-text">Matricular Aluno</span>
+                </button>
+            </div>
         </div>
     </div>
     
@@ -210,34 +215,185 @@ jQuery(document).ready(function($) {
     $('#btn-editar-detalhes').on('click', function() { viewMode.fadeOut(200, () => editMode.fadeIn(200)); });
     $('#btn-cancelar-edicao').on('click', function() { editMode.fadeOut(200, () => viewMode.fadeIn(200)); });
     
-    $('#form-detalhes').on('submit', function(e) {
-        e.preventDefault();
-        btnSalvarDetalhes.addClass('is-loading').prop('disabled', true);
-        const data = { /* ... coleta de dados ... */ };
+$('#form-detalhes').on('submit', function(e) {
+    e.preventDefault();
+    
+    // ADICIONADO: Ativa a animação e desabilita o botão
+    btnSalvarDetalhes.addClass('is-loading').prop('disabled', true);
 
-        fetch('api_gerenciar_turma.php', { /* ... fetch para salvar detalhes ... */ })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                // ... (lógica de atualização visual dos detalhes) ...
-                editMode.fadeOut(200, () => viewMode.fadeIn(200));
-            } else {
-                alert('Erro: ' + result.message);
-            }
-        })
-        .finally(() => {
-             btnSalvarDetalhes.removeClass('is-loading').prop('disabled', false);
-        });
+    // Seus dados e a requisição fetch continuam os mesmos...
+    const data = { 
+        action: 'salvar_detalhes',
+        id_turma: idTurma,
+        nome_turma: $('#edit-nome-turma').val(),
+        numero_maximo_alunos: $('#edit-max-alunos').val(),
+        data_inicio: $('#edit-data-inicio').val(),
+        data_fim: $('#edit-data-fim').val(),
+        id_professor_regente: $('#edit-professor-regente').val(),
+        status: $('#edit-status').val(),
+        descricao: $('#edit-descricao').val()
+    };
+
+    fetch('api_gerenciar_turma.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // ... (lógica de atualização visual dos detalhes que você já tem) ...
+            alert('Detalhes da turma atualizados com sucesso!');
+            editMode.fadeOut(200, () => viewMode.fadeIn(200));
+
+            // Atualiza os campos na tela
+            $('#titulo-turma').text('Gerenciar Turma: ' + result.turma.nome_turma);
+            $('span[data-field="nome_turma"]').text(result.turma.nome_turma);
+            // ... (atualize os outros campos aqui se necessário)
+        } else {
+            alert('Erro: ' + result.message);
+        }
+    })
+    .catch(error => console.error('Erro:', error))
+    .finally(() => { // O bloco .finally() já estava aqui, perfeito!
+         btnSalvarDetalhes.removeClass('is-loading').prop('disabled', false);
     });
+});
+
 
     // =======================================================
     // 2. LÓGICA PARA GERENCIAR ALUNOS
     // =======================================================
-    const listaAlunosEl = $('#lista-alunos-matriculados');
-    $('#select-adicionar-aluno').select2({ /* ... configuração do select2 ... */ });
-    $('#btn-adicionar-aluno').on('click', function() { /* ... lógica fetch para matricular ... */ });
-    listaAlunosEl.on('click', '.btn-remover-aluno', function() { /* ... lógica fetch para desmatricular ... */ });
+const listaAlunosEl = $('#lista-alunos-matriculados');
 
+// --- Configuração da Busca de Alunos (Select2 com AJAX) ---
+$('#select-adicionar-aluno').select2({
+    placeholder: 'Digite o nome ou CPF do aluno...',
+    minimumInputLength: 3, // Inicia a busca após 3 caracteres digitados
+    ajax: {
+        url: 'api_buscar_alunos.php', // O arquivo PHP que faz a busca
+        dataType: 'json',
+        delay: 250, // Pequena pausa para não sobrecarregar o servidor
+        data: function (params) {
+            return {
+                q: params.term // 'q' é o nome do parâmetro que a API espera
+            };
+        },
+        processResults: function (data) {
+            // Formata a resposta da API para o formato que o Select2 entende
+            return {
+                results: data.results
+            };
+        },
+        cache: true
+    },
+    language: {
+        noResults: function () {
+            return "Nenhum aluno encontrado";
+        },
+        inputTooShort: function () {
+            return "Digite 3 ou mais caracteres para buscar...";
+        },
+        searching: function() {
+            return "Buscando...";
+        }
+    }
+});
+
+// --- Lógica para ADICIONAR aluno ---
+$('#btn-adicionar-aluno').on('click', function() {
+    const idAlunoSelecionado = $('#select-adicionar-aluno').val();
+    const btnAdicionarAluno = $(this);
+
+    if (!idAlunoSelecionado) {
+        alert('Por favor, busque e selecione um aluno primeiro.');
+        return;
+    }
+
+    btnAdicionarAluno.addClass('is-loading').prop('disabled', true);
+
+    const payload = {
+        action: 'matricular_aluno',
+        id_turma: idTurma,
+        id_aluno: idAlunoSelecionado
+    };
+
+    fetch('api_gerenciar_turma.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            $('#sem-alunos-msg').remove();
+            const novoAlunoHtml = `
+                <div class="aluno-item" id="matricula-${result.id_matricula}">
+                    <span>${result.aluno.nome_completo} (CPF: ${result.aluno.cpf})</span>
+                    <button class="btn-action btn-delete btn-remover-aluno" data-id-matricula="${result.id_matricula}" title="Desmatricular Aluno">&times;</button>
+                </div>
+            `;
+            listaAlunosEl.append(novoAlunoHtml);
+            const contadorEl = $('#contador-alunos');
+            const novoTotal = parseInt(contadorEl.text()) + 1;
+            contadorEl.text(novoTotal);
+            $('#select-adicionar-aluno').val(null).trigger('change');
+        } else {
+            alert('Erro: ' + result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        alert('Ocorreu um erro de comunicação. Tente novamente.');
+    })
+    .finally(() => {
+        btnAdicionarAluno.removeClass('is-loading').prop('disabled', false);
+    });
+});
+
+// --- Lógica para REMOVER aluno ---
+listaAlunosEl.on('click', '.btn-remover-aluno', function() {
+    if (!confirm('Tem certeza que deseja desmatricular este aluno?')) {
+        return;
+    }
+
+    const idMatricula = $(this).data('id-matricula');
+    const elementoAluno = $(`#matricula-${idMatricula}`);
+
+    const payload = {
+        action: 'desmatricular_aluno',
+        id_turma: idTurma,
+        id_matricula: idMatricula
+    };
+
+    fetch('api_gerenciar_turma.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            elementoAluno.fadeOut(300, function() { 
+                $(this).remove(); 
+                
+                const contadorEl = $('#contador-alunos');
+                const novoTotal = parseInt(contadorEl.text()) - 1;
+                contadorEl.text(novoTotal);
+
+                if (listaAlunosEl.children('.aluno-item').length === 0) {
+                    listaAlunosEl.html('<p id="sem-alunos-msg">Nenhum aluno matriculado.</p>');
+                }
+            });
+        } else {
+            alert('Erro ao desmatricular: ' + result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        alert('Ocorreu um erro de comunicação. Tente novamente.');
+    });
+});
 
     // =======================================================
     // 3. LÓGICA COMPLETA E REATORADA DA GRADE DE HORÁRIOS
