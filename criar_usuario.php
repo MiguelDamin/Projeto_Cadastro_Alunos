@@ -1,9 +1,9 @@
 <?php
 // --- CONFIGURAÇÃO DO NOVO USUÁRIO ---
-$nome_completo = 'Miguelito';
-$email_login = 'miguel@gmail.com';
+$nome_completo = 'Cleber';
+$email_login = 'cleber@gmail.com';
 $senha_plana = 'Miguel11!'; // Use uma senha forte no seu projeto real!
-$perfil = 'administrador'; 
+$perfil = 'aluno'; 
 
 // Gera um hash seguro para a senha
 $senha_hash = password_hash($senha_plana, PASSWORD_DEFAULT);

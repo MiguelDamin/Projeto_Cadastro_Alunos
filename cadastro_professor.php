@@ -23,8 +23,6 @@ try {
 <?php if (isset($_GET['sucesso'])): ?>
     <div class="alerta sucesso">Professor cadastrado com sucesso!</div>
 <?php endif; ?>
-
-
 <form method="POST" action="processa_cadastro_professor.php" class="form-cadastro">
     
     <!-- TELA 1: INFORMAÇÕES PESSOAIS -->
@@ -117,7 +115,7 @@ try {
         <div class="form-row">
             <div class="form-group">
                 <label for="numero_matricula">Nivel de Escolaridade</label>
-                <input type="text" id="nivel_escolaridade" name="nivel_escolaridade" required>
+                <input type="text" id="nivel_escolaridade" name="nivel_escolaridade" placeholder="Ex: Graduado em Matemática" required>
             </div>
             <div class="form-group">
                 <label for="data_admissao">Data de Admissão </label>
@@ -232,7 +230,7 @@ input[type="text"], input[type="email"], input[type="date"], select {
     width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;
 }
 .alerta { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-.alerta.erro { background: #f8d7da; color: #721c24; }
+.alerta.erro { background: #f48d7d; color: #721c24; }
 .alerta.sucesso { background: #d4edda; color: #155724; }
 </style>
 

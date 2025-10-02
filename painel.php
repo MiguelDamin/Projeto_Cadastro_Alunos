@@ -3,6 +3,23 @@
 require 'templates/header.php';
 require 'conexao.php';
 
+// Buscar o perfil do usuário atual para controle de acesso
+$usuario_pode_gerenciar_avisos = false;
+$perfils_autorizados = ['administrador', 'diretor', 'secretaria', 'professor'];
+
+try {
+    $stmt = $pdo->prepare("SELECT perfil FROM usuarios WHERE id = ?");
+    $stmt->execute([$_SESSION['usuario_id']]);
+    $usuario_atual = $stmt->fetch();
+    
+    if ($usuario_atual && in_array($usuario_atual['perfil'], $perfils_autorizados)) {
+        $usuario_pode_gerenciar_avisos = true;
+    }
+} catch (PDOException $e) {
+    // Em caso de erro, assume que não pode gerenciar
+    $usuario_pode_gerenciar_avisos = false;
+}
+
 // CONSULTA ATUALIZADA: Buscar apenas avisos que ainda não expiraram
 try {
     $avisos = $pdo->query("
@@ -35,6 +52,19 @@ try {
     <p>Bem-vindo ao sistema de gestão escolar. Aqui você pode gerenciar alunos, responsáveis e turmas.</p>
 </div>
 
+<!-- Mensagem de erro de acesso negado -->
+<?php if (isset($_GET['erro']) && $_GET['erro'] === 'acesso_negado'): ?>
+    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+        <strong>⚠️ Acesso Negado:</strong> Apenas professores, secretárias, diretores e administradores podem gerenciar avisos.
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['erro']) && $_GET['erro'] === 'erro_sistema'): ?>
+    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+        <strong>❌ Erro do Sistema:</strong> Ocorreu um erro ao verificar suas permissões.
+    </div>
+<?php endif; ?>
+
 <!-- Seção de Avisos Recentes (com sistema de expiração) -->
 <?php if (!empty($avisos)): ?>
 <div style="margin-bottom: 30px;">
@@ -53,10 +83,10 @@ try {
                     <h4 style="margin: 0; font-size: 18px; font-weight: bold;">
                         <?php echo htmlspecialchars($aviso['titulo']); ?>
                     </h4>
-        <div style="position: absolute; top: 20px; left: 1010px; text-align: right; font-size: 12px; opacity: 0.9;">
-            <div><?php echo date('d/m/Y', strtotime($aviso['data_publicacao'])); ?></div>
-            <div><?php echo date('H:i', strtotime($aviso['data_publicacao'])); ?></div>
-        </div>
+                    <div style="text-align: right; font-size: 12px; opacity: 0.9; margin-left: auto;">
+                        <div><?php echo date('d/m/Y', strtotime($aviso['data_publicacao'])); ?></div>
+                        <div><?php echo date('H:i', strtotime($aviso['data_publicacao'])); ?></div>
+                    </div>
                 </div>
                 
                 <p style="margin: 0; line-height: 1.5; font-size: 15px;">
@@ -81,9 +111,15 @@ try {
     </div>
     
     <div style="text-align: center; margin-top: 15px;">
-        <a href="adicionar_avisos.php" style="text-decoration: none; background: #28a745; color: white; padding: 8px 16px; border-radius: 5px; font-size: 14px; font-weight: 600;">
-            ➕ Adicionar Novo Aviso
-        </a>
+        <?php if ($usuario_pode_gerenciar_avisos): ?>
+            <a href="adicionar_avisos.php" style="text-decoration: none; background: #28a745; color: white; padding: 8px 16px; border-radius: 5px; font-size: 14px; font-weight: 600;">
+                ➕ Adicionar Novo Aviso
+            </a>
+        <?php else: ?>
+            <p style="color: #6c757d; font-size: 12px; margin: 0;">
+                Apenas professores e administradores podem adicionar avisos.
+            </p>
+        <?php endif; ?>
     </div>
 </div>
 <?php else: ?>
@@ -97,9 +133,15 @@ try {
         <p style="color: #6c757d; margin: 10px 0 20px 0; font-size: 14px;">
             Todos os avisos podem ter expirado ou não há avisos publicados.
         </p>
-        <a href="adicionar_avisos.php" style="text-decoration: none; background: #007bff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600;">
-            ➕ Publicar Primeiro Aviso
-        </a>
+        <?php if ($usuario_pode_gerenciar_avisos): ?>
+            <a href="adicionar_avisos.php" style="text-decoration: none; background: #007bff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600;">
+                ➕ Publicar Primeiro Aviso
+            </a>
+        <?php else: ?>
+            <p style="color: #6c757d; font-size: 12px; margin: 10px 0 0 0;">
+                Aguarde, em breve novos avisos serão publicados pelos professores.
+            </p>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>
@@ -343,7 +385,9 @@ try {
 <div class="mural-avisos-container">
     <div class="mural-avisos-header">
         <h3>📋 Mural de Avisos Completo</h3>
-        <a href="adicionar_avisos.php" class="link-novo-aviso">➕ Gerenciar Avisos</a>
+        <?php if ($usuario_pode_gerenciar_avisos): ?>
+            <a href="adicionar_avisos.php" class="link-novo-aviso">➕ Gerenciar Avisos</a>
+        <?php endif; ?>
     </div>
 
     <?php 
@@ -376,9 +420,15 @@ try {
     <?php if (empty($todos_avisos)): ?>
         <div class="aviso-vazio">
             <p>Nenhum aviso publicado ainda. Crie o primeiro aviso!</p>
-            <a href="adicionar_avisos.php" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                ➕ Criar Primeiro Aviso
-            </a>
+            <?php if ($usuario_pode_gerenciar_avisos): ?>
+                <a href="adicionar_avisos.php" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                    ➕ Criar Primeiro Aviso
+                </a>
+            <?php else: ?>
+                <p style="color: #6c757d; font-size: 14px; margin-top: 15px;">
+                    Aguarde, em breve avisos serão publicados.
+                </p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="mural-avisos-grid">
@@ -417,6 +467,10 @@ try {
                     <div class="aviso-card-footer">
                         <div style="font-size: 0.75rem; color: #6c757d;">
                             <?php echo $aviso['expirado'] ? 'Este aviso expirou e não aparece mais nos avisos recentes' : 'Visível nos avisos recentes'; ?>
+                        </div>
+                        <div class="card-actions">
+                            <a href="editar_aviso.php?id=<?php echo $aviso['id']; ?>">Editar</a>
+                            <a href="excluir_aviso.php?id=<?php echo $aviso['id']; ?>" onclick="return confirm('Tem certeza que deseja excluir este aviso?');">Excluir</a>
                         </div>
                     </div>
                 </div>
